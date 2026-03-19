@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: cn-backend
+    env: docker
+    plan: free
+    region: singapore
+    envVars:
+      - key: PORT
+        value: 8081
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false

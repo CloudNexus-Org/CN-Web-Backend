@@ -1,0 +1,26 @@
+server:
+  port: ${PORT:8081}
+
+spring:
+  application:
+    name: cn-backend
+  datasource:
+    # JDBC URL format for Supabase
+    url: ${DB_URL:jdbc:postgresql://db.uqlyhicgvqawiiixuumy.supabase.co:5432/postgres?sslmode=require}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:CN-Web-Version0}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # Automatically creates/updates tables based on entity classes
+    show-sql: true # Helpful for debugging 
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+# Logging level
+logging:
+  level:
+    org.springframework.web: INFO
+    com.cloudnexus.backend: DEBUG
