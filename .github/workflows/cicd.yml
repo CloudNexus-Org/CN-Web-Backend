@@ -2,9 +2,9 @@ name: Backend - Build & Push to Docker Hub
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, feature/harsh]
   pull_request:
-    branches: [main, master]
+    branches: [main, master, feature/harsh]
 
 jobs:
   build-and-push:
