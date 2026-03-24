@@ -40,3 +40,14 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/cloudnexus-backend:latest
             ${{ secrets.DOCKER_USERNAME }}/cloudnexus-backend:${{ github.sha }}
+
+
+
+
+
+
+
+
+
+
+
