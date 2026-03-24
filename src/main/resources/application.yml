@@ -7,8 +7,8 @@ spring:
   datasource:
     # JDBC URL format for Supabase
     url: ${DB_URL:jdbc:postgresql://db.uqlyhicgvqawiiixuumy.supabase.co:5432/postgres?sslmode=require}
-    username: ${DB_USER:postgres}
-    password: ${DB_PASS:CN-Web-Version0}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:CN-Web-Version0}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
