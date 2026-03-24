@@ -19,8 +19,8 @@ public class WebConfig {
         // Allow both localhost and the network IP
         config.setAllowedOriginPatterns(Arrays.asList(
             "http://localhost:3000",
-            "http://192.168.31.43:3000",
-            "http://192.168.1.10:3000"
+            "http://13.235.247.133:3000",
+            "http://13.235.247.133:3000"
 
 
             
