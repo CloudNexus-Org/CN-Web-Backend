@@ -15,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/leads")
 @RequiredArgsConstructor
+@CrossOrigin(origins = {"http://localhost:3000", "http://13.201.109.105:3000"})
 public class LeadController {
 
     private final LeadService leadService;
