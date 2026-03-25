@@ -20,8 +20,10 @@ public class WebConfig {
         config.setAllowedOriginPatterns(Arrays.asList(
             "http://localhost:3000",
             "http://13.201.109.105:3000",
-            "http://13.201.109.105:8081",
-            "http://13.201.109.105"
+            "http://13.201.109.105:3000"
+
+
+            
         ));
         
         config.setAllowedHeaders(Arrays.asList("*"));
