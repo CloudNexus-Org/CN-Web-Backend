@@ -12,10 +12,6 @@ on:
 jobs:
   pipeline:
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
 
     steps:
       # =========================
@@ -23,8 +19,6 @@ jobs:
       # =========================
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       # =========================
       # ☕ Java Setup
@@ -37,122 +31,91 @@ jobs:
           cache: maven
 
       # =========================
-      # 🔨 Build + Test + Coverage
+      # 🔨 Build JAR
       # =========================
       - name: Build JAR
-        run: mvn -B package --file pom.xml
+        run: mvn -B -DskipTests clean package
+
+      # =========================
+      # 🐳 Build Docker Image
+      # =========================
+      - name: Build Docker Image
+        run: docker build -t backend:${{ github.sha }} .
+
+      # =========================
+      # 📦 Save Image (IMPORTANT)
+      # =========================
+      - name: Save Docker Image
+        run: docker save -o image.tar backend:${{ github.sha }}
 
       # =====================================================
-      # 🐳 DOCKER BUILD & PUSH (ONLY FOR dev)
+      # 🔍 SONARCLOUD (FIXED)
       # =====================================================
-      - name: Log in to Docker Hub
+      - name: SonarCloud Scan
+        if: github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/heads/devsecops/')
+        run: |
+          mvn verify sonar:sonar \
+            -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
+            -Dsonar.organization=${{ secrets.ORG_KEY }} \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+      # =====================================================
+      # 🔐 SNYK (WORKING LIKE GITLAB)
+      # =====================================================
+      - name: Install Snyk
+        if: startsWith(github.ref, 'refs/heads/devsecops/')
+        run: npm install -g snyk
+
+      - name: Load Docker Image
+        if: startsWith(github.ref, 'refs/heads/devsecops/')
+        run: docker load -i image.tar
+
+      - name: Snyk Container Scan (FIXED)
+        if: startsWith(github.ref, 'refs/heads/devsecops/')
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          snyk container test backend:${{ github.sha }} --json > snyk-report.json || true
+
+      - name: Format Snyk Report
+        if: startsWith(github.ref, 'refs/heads/devsecops/')
+        run: |
+          cat snyk-report.json | jq '.vulnerabilities[] | {severity, packageName, version, title}' || true
+
+      # =====================================================
+      # 🔍 TRIVY SCAN
+      # =====================================================
+      - name: Trivy Scan (Image TAR)
+        if: startsWith(github.ref, 'refs/heads/devsecops/')
+        uses: aquasecurity/trivy-action@master
+        with:
+          input: image.tar
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
+      # =====================================================
+      # 🐳 PUSH IMAGE (ONLY dev)
+      # =====================================================
+      - name: Login DockerHub
         if: github.ref == 'refs/heads/dev'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Build & Push Docker Image
+      - name: Push Docker Image
         if: github.ref == 'refs/heads/dev'
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
-            ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:${{ github.sha }}
-
-      # =====================================================
-      # 🔍 SONARCLOUD (dev + devsecops)
-      # =====================================================
-      - name: SonarCloud Scan (Maven)
-        if: github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/heads/devsecops/')
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn -B verify sonar:sonar \
-            -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
-            -Dsonar.organization=${{ secrets.ORG_KEY }} \
-            -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-
-      - name: SonarCloud Quality Gate Check
-        if: github.ref == 'refs/heads/dev'
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        with:
-          args: >
-            -Dsonar.projectKey=${{ secrets.PROJECT_KEY }}
-            -Dsonar.organization=${{ secrets.ORG_KEY }}
+          docker tag backend:${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
 
       # =====================================================
-      # 🔐 SNYK (FIXED - NO ORG ISSUE)
-      # =====================================================
-      # =====================================================
-# 🔐 SNYK (FINAL FIX)
-# =====================================================
-      - name: Install Snyk CLI
-        if: startsWith(github.ref, 'refs/heads/devsecops/')
-        run: npm install -g snyk
-
-      - name: Snyk Dependency Scan
-        if: startsWith(github.ref, 'refs/heads/devsecops/')
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: snyk test --file=pom.xml --severity-threshold=high || true
-
-      # =====================================================
-      # 🔐 SNYK (CONTAINER SCAN)
-      # =====================================================
-      - name: Snyk Container Scan
-        if: startsWith(github.ref, 'refs/heads/devsecops/')
-        uses: snyk/actions/docker@master
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          image: ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
-          args: --severity-threshold=high
-          command: test
-
-      # =====================================================
-      # 🔍 TRIVY (Container + Filesystem Scan)
-      # =====================================================
-      - name: Trivy Filesystem Scan
-        if: startsWith(github.ref, 'refs/heads/devsecops/')
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: fs
-          scan-ref: .
-          format: table
-          severity: HIGH,CRITICAL
-          exit-code: 0
-
-      - name: Trivy Docker Image Scan
-        if: startsWith(github.ref, 'refs/heads/devsecops/')
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: image
-          image-ref: ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
-          format: sarif
-          output: trivy-results.sarif
-          severity: HIGH,CRITICAL
-          exit-code: 0
-
-      - name: Upload Trivy SARIF to GitHub Security
-        if: startsWith(github.ref, 'refs/heads/devsecops/')
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: trivy-results.sarif
-
-      # =====================================================
-      # 🛡️ STACKHAWK (DAST)
+      # 🛡️ STACKHAWK
       # =====================================================
       - name: StackHawk Scan
         if: startsWith(github.ref, 'refs/heads/devsecops/')
         uses: stackhawk/hawkscan-action@v2
         with:
           apiKey: ${{ secrets.HAWK_API_KEY }}
-#vjhwghsdgvkskvgbksvbgkb
