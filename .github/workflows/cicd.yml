@@ -109,6 +109,9 @@ jobs:
     needs: build
     if: startsWith(github.ref, 'refs/heads/devsecops/')
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Download Docker Image Artifact
         uses: actions/download-artifact@v4
         with:
@@ -117,17 +120,25 @@ jobs:
       - name: Load Docker Image
         run: docker load -i image.tar
 
-      - name: Install Snyk + jq
+      - name: Install Snyk + Dependencies
         run: |
-          npm install -g snyk
+          npm install -g snyk snyk-to-html
           sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Snyk Container Scan
+      - name: Snyk Container Test & Monitor
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        run: snyk container test backend:${{ github.sha }} --json > snyk-report.json || true
+        run: |
+          # Test and generate JSON report
+          snyk container test backend:${{ github.sha }} --json > snyk-report.json || true
+          
+          # Monitor the image in Snyk UI (sends results to dashboard)
+          snyk container monitor backend:${{ github.sha }} --project-name="CloudNexus-Backend-${{ github.ref_name }}" || true
+          
+          # Generate HTML report for better visualization
+          snyk-to-html -i snyk-report.json -o snyk-report.html || true
 
-      - name: Generate Snyk Summary Report
+      - name: Generate Enhanced Snyk Summary Report
         if: always()
         run: |
           echo "================================================" > snyk-summary.txt
@@ -136,32 +147,61 @@ jobs:
           echo "Image     : backend:${{ github.sha }}"           >> snyk-summary.txt
           echo "Branch    : ${{ github.ref_name }}"              >> snyk-summary.txt
           echo "Commit    : ${{ github.sha }}"                   >> snyk-summary.txt
+          echo "Project   : CloudNexus-Backend-${{ github.ref_name }}" >> snyk-summary.txt
+          echo "Dashboard : https://app.snyk.io/"               >> snyk-summary.txt
           echo "Timestamp : $(date -u)"                         >> snyk-summary.txt
           echo "------------------------------------------------" >> snyk-summary.txt
           echo "" >> snyk-summary.txt
+          
+          # Extract vulnerability counts
           CRITICAL=$(jq '[.vulnerabilities[]? | select(.severity=="critical")] | length' snyk-report.json 2>/dev/null || echo 0)
           HIGH=$(jq '[.vulnerabilities[]? | select(.severity=="high")] | length' snyk-report.json 2>/dev/null || echo 0)
           MEDIUM=$(jq '[.vulnerabilities[]? | select(.severity=="medium")] | length' snyk-report.json 2>/dev/null || echo 0)
           LOW=$(jq '[.vulnerabilities[]? | select(.severity=="low")] | length' snyk-report.json 2>/dev/null || echo 0)
-          echo "SUMMARY:"                                        >> snyk-summary.txt
-          echo "  Critical : $CRITICAL"                         >> snyk-summary.txt
-          echo "  High     : $HIGH"                             >> snyk-summary.txt
-          echo "  Medium   : $MEDIUM"                           >> snyk-summary.txt
-          echo "  Low      : $LOW"                              >> snyk-summary.txt
+          TOTAL=$((CRITICAL + HIGH + MEDIUM + LOW))
+          
+          echo "VULNERABILITY SUMMARY:"                         >> snyk-summary.txt
+          echo "  Total      : $TOTAL"                          >> snyk-summary.txt
+          echo "  Critical   : $CRITICAL"                       >> snyk-summary.txt
+          echo "  High       : $HIGH"                           >> snyk-summary.txt
+          echo "  Medium     : $MEDIUM"                         >> snyk-summary.txt
+          echo "  Low        : $LOW"                            >> snyk-summary.txt
           echo "" >> snyk-summary.txt
+          
+          # Base image info
+          BASE_IMAGE=$(jq -r '.docker.baseImage // "Unknown"' snyk-report.json 2>/dev/null)
+          echo "BASE IMAGE: $BASE_IMAGE"                        >> snyk-summary.txt
+          echo "" >> snyk-summary.txt
+          
           echo "------------------------------------------------" >> snyk-summary.txt
           echo "CRITICAL & HIGH VULNERABILITIES:"               >> snyk-summary.txt
           echo "------------------------------------------------" >> snyk-summary.txt
+          
+          # Detailed vulnerability info
           jq -r '.vulnerabilities[]? | select(.severity=="critical" or .severity=="high") |
-            "[" + (.severity | ascii_upcase) + "] " + .title +
-            "\n  Package : " + .packageName +
-            "\n  Version : " + .version +
-            "\n  Fix     : " + (.fixedIn[0] // "No fix available") +
-            "\n"' snyk-report.json >> snyk-summary.txt 2>/dev/null || echo "  No critical/high vulnerabilities found" >> snyk-summary.txt
+            "[⚠️ " + (.severity | ascii_upcase) + "] " + .title +
+            "\n  📦 Package : " + .packageName +
+            "\n  📊 Version : " + .version +
+            "\n  🔧 Fix     : " + (.fixedIn[0] // "No fix available") +
+            "\n  🔗 CVE     : " + (.identifiers.CVE[0] // "N/A") +
+            "\n  📝 Score   : " + (.cvssScore // "N/A") + "/10" +
+            "\n"' snyk-report.json >> snyk-summary.txt 2>/dev/null || echo "  ✅ No critical/high vulnerabilities found" >> snyk-summary.txt
+          
+          echo "------------------------------------------------" >> snyk-summary.txt
+          echo "RECOMMENDATIONS:"                               >> snyk-summary.txt
+          echo "------------------------------------------------" >> snyk-summary.txt
+          if [ "$TOTAL" -gt 0 ]; then
+            echo "  • View detailed report: snyk-report.html"     >> snyk-summary.txt
+            echo "  • Check Snyk Dashboard: https://app.snyk.io/" >> snyk-summary.txt
+            echo "  • Update base image to latest version"        >> snyk-summary.txt
+            echo "  • Review and apply security patches"          >> snyk-summary.txt
+          else
+            echo "  ✅ No vulnerabilities found - image is secure!" >> snyk-summary.txt
+          fi
           echo "================================================" >> snyk-summary.txt
           cat snyk-summary.txt
 
-      - name: Upload Snyk Report
+      - name: Upload Enhanced Snyk Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -169,6 +209,7 @@ jobs:
           path: |
             snyk-summary.txt
             snyk-report.json
+            snyk-report.html
 
   # =========================
   # 🔍 TRIVY
