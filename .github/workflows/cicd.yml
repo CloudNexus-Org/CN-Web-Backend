@@ -43,7 +43,7 @@ jobs:
         run: docker build -t backend:${{ github.sha }} .
 
       # =========================
-      # 📦 Save Image (IMPORTANT)
+      # 📦 Save Docker Image
       # =========================
       - name: Save Docker Image
         run: docker save -o image.tar backend:${{ github.sha }}
@@ -53,40 +53,41 @@ jobs:
       # =====================================================
       - name: SonarCloud Scan
         if: github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/heads/devsecops/')
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          mvn -B verify sonar:sonar \
+          mvn verify sonar:sonar \
             -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
             -Dsonar.organization=${{ secrets.ORG_KEY }} \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
       # =====================================================
-      # 🔐 SNYK (WORKING LIKE GITLAB)
+      # 🔐 SNYK (CONTAINER SCAN - FINAL)
       # =====================================================
-      - name: Install Snyk
+      - name: Install Snyk + jq
         if: startsWith(github.ref, 'refs/heads/devsecops/')
-        run: npm install -g snyk
+        run: |
+          npm install -g snyk
+          sudo apt-get update && sudo apt-get install -y jq
 
       - name: Load Docker Image
         if: startsWith(github.ref, 'refs/heads/devsecops/')
         run: docker load -i image.tar
 
-      - name: Snyk Container Scan (FIXED)
+      - name: Snyk Container Scan
         if: startsWith(github.ref, 'refs/heads/devsecops/')
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           snyk container test backend:${{ github.sha }} --json > snyk-report.json || true
 
-      - name: Format Snyk Report
+      - name: Show Snyk Report
         if: startsWith(github.ref, 'refs/heads/devsecops/')
         run: |
           jq -r '
             if .vulnerabilities then
               .vulnerabilities[] | {severity, packageName, version, title}
+            elif .issues then
+              .issues[] | {severity, pkgName, pkgVersion, issue}
             else
               "No vulnerabilities found"
             end
