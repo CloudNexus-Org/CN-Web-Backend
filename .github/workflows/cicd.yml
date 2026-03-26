@@ -68,7 +68,7 @@ jobs:
             -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
             -Dsonar.organization=${{ secrets.ORG_KEY }} \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
       # =====================================================
       # 🔐 SNYK (FIXED - NO ORG ISSUE)
@@ -97,6 +97,7 @@ jobs:
         with:
           image: ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
           args: --severity-threshold=high
+          command: test
 
       # =====================================================
       # 🛡️ STACKHAWK (DAST)
