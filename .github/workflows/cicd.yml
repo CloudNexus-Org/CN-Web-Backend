@@ -63,8 +63,8 @@ jobs:
         if: startsWith(github.ref, 'refs/heads/devsecops/')
         run: mvn -B verify sonar:sonar -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} -Dsonar.organization=${{ secrets.ORG_KEY }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
-      # =====================================================
-      # 🔐 SNYK (DEPENDENCY SCAN - FIXED)
+            # =====================================================
+      # 🔐 SNYK (DEPENDENCY SCAN - FINAL)
       # =====================================================
       - name: Install Snyk CLI
         if: startsWith(github.ref, 'refs/heads/devsecops/')
@@ -76,10 +76,10 @@ jobs:
 
       - name: Snyk Dependency Scan
         if: startsWith(github.ref, 'refs/heads/devsecops/')
-        run: snyk test --severity-threshold=high --org=${{ secrets.SNYK_ORG }}
+        run: snyk test --file=pom.xml --severity-threshold=high --org=${{ secrets.SNYK_ORG }}
 
       # =====================================================
-      # 🔐 SNYK (CONTAINER SCAN)
+      # 🔐 SNYK (CONTAINER SCAN - IMPROVED)
       # =====================================================
       - name: Snyk Container Scan
         if: startsWith(github.ref, 'refs/heads/devsecops/')
@@ -88,9 +88,10 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           image: ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
+          args: --severity-threshold=high
 
       # =====================================================
-      # 🛡️ STACKHAWK (DAST)
+      # 🛡️ STACKHAWK (DAST - FINAL)
       # =====================================================
       - name: StackHawk Scan
         if: startsWith(github.ref, 'refs/heads/devsecops/')
