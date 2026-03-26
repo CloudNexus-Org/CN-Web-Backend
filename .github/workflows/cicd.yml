@@ -71,13 +71,17 @@ jobs:
       # =====================================================
       # 🔐 SNYK (DEPENDENCY SCAN)
       # =====================================================
+      - name: Install Snyk CLI
+        if: startsWith(github.ref, 'refs/heads/devsecops/')
+        run: npm install -g snyk
+
+      - name: Authenticate Snyk
+        if: startsWith(github.ref, 'refs/heads/devsecops/')
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
       - name: Snyk Dependency Scan
         if: startsWith(github.ref, 'refs/heads/devsecops/')
-        uses: snyk/actions/maven@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
+        run: snyk test --severity-threshold=high
 
       # =====================================================
       # 🔐 SNYK (CONTAINER SCAN)
