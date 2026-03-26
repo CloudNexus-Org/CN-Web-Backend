@@ -61,7 +61,8 @@ jobs:
       # =====================================================
       - name: SonarCloud Scan (Maven)
         if: startsWith(github.ref, 'refs/heads/devsecops/')
-        run: mvn -B verify sonar:sonar \
+        run: |
+          mvn -B verify sonar:sonar \
           -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
           -Dsonar.organization=${{ secrets.ORG_KEY }} \
           -Dsonar.host.url=https://sonarcloud.io \

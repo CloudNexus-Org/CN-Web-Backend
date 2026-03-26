@@ -1,6 +1,6 @@
 app:
-  applicationId: your-app-id
-  env: dev
+  applicationId: dc0b8461-db83-42a2-b887-d7d8d6651282
+  env: development
 
 scan:
   baseUrl: http://13.201.109.105:8081
