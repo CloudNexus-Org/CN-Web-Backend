@@ -63,15 +63,25 @@ jobs:
       # =====================================================
       - name: SonarCloud Scan (Maven)
         if: github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/heads/devsecops/')
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn -B verify sonar:sonar \
             -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
             -Dsonar.organization=${{ secrets.ORG_KEY }} \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-            -Dsonar.qualitygate.wait=true \
-            -Dsonar.coverage.minimum=90
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+
+      - name: SonarCloud Quality Gate Check
+        if: github.ref == 'refs/heads/dev'
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ secrets.PROJECT_KEY }}
+            -Dsonar.organization=${{ secrets.ORG_KEY }}
 
       # =====================================================
       # 🔐 SNYK (FIXED - NO ORG ISSUE)
