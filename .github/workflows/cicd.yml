@@ -63,8 +63,16 @@ jobs:
         run: |
           mvn verify sonar:sonar \
             -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
-            -Dsonar.host.url=http://${{ secrets.SONAR_IP }} \
-            -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.host.url=http://${{ secrets.SONAR_IP }}:9000 \
+            -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.qualitygate.wait=true 2>&1 | tee sonarqube-report.txt || true
+
+      - name: Upload SonarQube Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sonarqube-report
+          path: sonarqube-report.txt
 
   # =========================
   # 🔐 SNYK
@@ -104,6 +112,13 @@ jobs:
             end
           ' snyk-report.json || true
 
+      - name: Upload Snyk Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snyk-report
+          path: snyk-report.json
+
   # =========================
   # 🔍 TRIVY
   # =========================
@@ -121,9 +136,17 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           input: image.tar
-          format: table
+          format: json
+          output: trivy-report.json
           severity: HIGH,CRITICAL
           exit-code: 0
+
+      - name: Upload Trivy Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-report
+          path: trivy-report.json
 
   # =========================
   # 🛡️ STACKHAWK
@@ -140,6 +163,14 @@ jobs:
         uses: stackhawk/hawkscan-action@v2
         with:
           apiKey: ${{ secrets.HAWK_API_KEY }}
+          hawk-scan-failure-threshold: high
+
+      - name: Upload StackHawk Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stackhawk-report
+          path: .hawk/
 
   # =========================
   # 🐳 DOCKER PUSH
