@@ -33,10 +33,10 @@ jobs:
           cache: maven
 
       # =========================
-      # 🔨 Build
+      # 🔨 Build + Test + Coverage
       # =========================
       - name: Build JAR
-        run: mvn -B package -DskipTests --file pom.xml
+        run: mvn -B package --file pom.xml
 
       # =====================================================
       # 🐳 DOCKER BUILD & PUSH (ONLY FOR dev)
@@ -68,7 +68,10 @@ jobs:
             -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
             -Dsonar.organization=${{ secrets.ORG_KEY }} \
             -Dsonar.host.url=https://sonarcloud.io \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+            -Dsonar.qualitygate.wait=true \
+            -Dsonar.coverage.minimum=90
 
       # =====================================================
       # 🔐 SNYK (FIXED - NO ORG ISSUE)
@@ -98,6 +101,36 @@ jobs:
           image: ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
           args: --severity-threshold=high
           command: test
+
+      # =====================================================
+      # 🔍 TRIVY (Container + Filesystem Scan)
+      # =====================================================
+      - name: Trivy Filesystem Scan
+        if: startsWith(github.ref, 'refs/heads/devsecops/')
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
+      - name: Trivy Docker Image Scan
+        if: startsWith(github.ref, 'refs/heads/devsecops/')
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: image
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
+          format: sarif
+          output: trivy-results.sarif
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
+      - name: Upload Trivy SARIF to GitHub Security
+        if: startsWith(github.ref, 'refs/heads/devsecops/')
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
 
       # =====================================================
       # 🛡️ STACKHAWK (DAST)
