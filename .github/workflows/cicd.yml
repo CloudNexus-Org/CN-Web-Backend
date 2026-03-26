@@ -1,15 +1,20 @@
-name: Backend - Build & Push to Docker Hub
+name: Backend - CI/CD + DevSecOps
 
 on:
   push:
-    branches: [dev]
+    branches:
+      - dev
+      - devsecops/**
   pull_request:
-    branches: [dev]
+    branches:
+      - dev
 
 jobs:
-  build-and-push:
+  # =========================
+  # 🔨 BUILD
+  # =========================
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -22,32 +27,318 @@ jobs:
           cache: maven
 
       - name: Build JAR
-        run: mvn -B package -DskipTests --file pom.xml
+        run: mvn -B clean package
 
-      - name: Log in to Docker Hub
-        if: github.event_name == 'push'
+      - name: Build Docker Image
+        run: docker build -t backend:${{ github.sha }} .
+
+      - name: Save Docker Image
+        run: docker save -o image.tar backend:${{ github.sha }}
+
+      - name: Upload Docker Image Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: image.tar
+
+  # =========================
+  # 🔍 SONARQUBE
+  # =========================
+  sonarqube:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/heads/devsecops/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: temurin
+          cache: maven
+
+      - name: SonarQube Scan
+        run: |
+          mvn verify sonar:sonar \
+          -Dsonar.projectKey=backend \
+          -Dsonar.projectName=backend \
+          -Dsonar.host.url=http://${{ secrets.SONAR_IP }} \
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.scm.provider=git \
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+          2>&1 | tee sonarqube-scan.log
+
+      - name: Generate SonarQube Summary Report
+        if: always()
+        run: |
+          echo "================================================" > sonarqube-report.txt
+          echo "       SONARQUBE SCAN REPORT - CloudNexus       " >> sonarqube-report.txt
+          echo "================================================" >> sonarqube-report.txt
+          echo "Project   : com.cloudnexus:backend"              >> sonarqube-report.txt
+          echo "Branch    : ${{ github.ref_name }}"              >> sonarqube-report.txt
+          echo "Commit    : ${{ github.sha }}"                   >> sonarqube-report.txt
+          echo "Run       : ${{ github.run_number }}"            >> sonarqube-report.txt
+          echo "Timestamp : $(date -u)"                         >> sonarqube-report.txt
+          echo "Dashboard : http://${{ secrets.SONAR_IP }}/dashboard?id=com.cloudnexus:backend" >> sonarqube-report.txt
+          echo "------------------------------------------------" >> sonarqube-report.txt
+          echo "" >> sonarqube-report.txt
+          echo "--- SCAN OUTPUT ---" >> sonarqube-report.txt
+          grep -E "(INFO|WARN|ERROR|Quality Gate|issues|bugs|vulnerabilities|code smells|coverage|duplications|ANALYSIS SUCCESSFUL|ANALYSIS FAILED)" sonarqube-scan.log >> sonarqube-report.txt || true
+          echo "" >> sonarqube-report.txt
+          echo "================================================" >> sonarqube-report.txt
+          cat sonarqube-report.txt
+
+      - name: Upload SonarQube Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sonarqube-report
+          path: |
+            sonarqube-report.txt
+            sonarqube-scan.log
+
+  # =========================
+  # 🔐 SNYK
+  # =========================
+  snyk:
+    runs-on: ubuntu-latest
+    needs: sonarqube
+    if: startsWith(github.ref, 'refs/heads/devsecops/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Docker Image Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker Image
+        run: docker load -i image.tar
+
+      - name: Install Snyk + Dependencies
+        run: |
+          npm install -g snyk snyk-to-html
+          sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Snyk Container Test & Monitor
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          # Test and generate JSON report
+          snyk container test backend:${{ github.sha }} --json > snyk-report.json || true
+          
+          # Monitor the image in Snyk UI (sends results to dashboard)
+          snyk container monitor backend:${{ github.sha }} --project-name="CloudNexus-Backend-${{ github.ref_name }}" || true
+          
+          # Generate HTML report for better visualization
+          snyk-to-html -i snyk-report.json -o snyk-report.html || true
+
+      - name: Generate Enhanced Snyk Summary Report
+        if: always()
+        run: |
+          echo "================================================" > snyk-summary.txt
+          echo "         SNYK CONTAINER SCAN REPORT            " >> snyk-summary.txt
+          echo "================================================" >> snyk-summary.txt
+          echo "Image     : backend:${{ github.sha }}"           >> snyk-summary.txt
+          echo "Branch    : ${{ github.ref_name }}"              >> snyk-summary.txt
+          echo "Commit    : ${{ github.sha }}"                   >> snyk-summary.txt
+          echo "Project   : CloudNexus-Backend-${{ github.ref_name }}" >> snyk-summary.txt
+          echo "Dashboard : https://app.snyk.io/"               >> snyk-summary.txt
+          echo "Timestamp : $(date -u)"                         >> snyk-summary.txt
+          echo "------------------------------------------------" >> snyk-summary.txt
+          echo "" >> snyk-summary.txt
+          
+          # Extract vulnerability counts
+          CRITICAL=$(jq '[.vulnerabilities[]? | select(.severity=="critical")] | length' snyk-report.json 2>/dev/null || echo 0)
+          HIGH=$(jq '[.vulnerabilities[]? | select(.severity=="high")] | length' snyk-report.json 2>/dev/null || echo 0)
+          MEDIUM=$(jq '[.vulnerabilities[]? | select(.severity=="medium")] | length' snyk-report.json 2>/dev/null || echo 0)
+          LOW=$(jq '[.vulnerabilities[]? | select(.severity=="low")] | length' snyk-report.json 2>/dev/null || echo 0)
+          TOTAL=$((CRITICAL + HIGH + MEDIUM + LOW))
+          
+          echo "VULNERABILITY SUMMARY:"                         >> snyk-summary.txt
+          echo "  Total      : $TOTAL"                          >> snyk-summary.txt
+          echo "  Critical   : $CRITICAL"                       >> snyk-summary.txt
+          echo "  High       : $HIGH"                           >> snyk-summary.txt
+          echo "  Medium     : $MEDIUM"                         >> snyk-summary.txt
+          echo "  Low        : $LOW"                            >> snyk-summary.txt
+          echo "" >> snyk-summary.txt
+          
+          # Base image info
+          BASE_IMAGE=$(jq -r '.docker.baseImage // "Unknown"' snyk-report.json 2>/dev/null)
+          echo "BASE IMAGE: $BASE_IMAGE"                        >> snyk-summary.txt
+          echo "" >> snyk-summary.txt
+          
+          echo "------------------------------------------------" >> snyk-summary.txt
+          echo "CRITICAL & HIGH VULNERABILITIES:"               >> snyk-summary.txt
+          echo "------------------------------------------------" >> snyk-summary.txt
+          
+          # Detailed vulnerability info
+          jq -r '.vulnerabilities[]? | select(.severity=="critical" or .severity=="high") |
+            "[⚠️ " + (.severity | ascii_upcase) + "] " + .title +
+            "\n  📦 Package : " + .packageName +
+            "\n  📊 Version : " + .version +
+            "\n  🔧 Fix     : " + (.fixedIn[0] // "No fix available") +
+            "\n  🔗 CVE     : " + (.identifiers.CVE[0] // "N/A") +
+            "\n  📝 Score   : " + (.cvssScore // "N/A") + "/10" +
+            "\n"' snyk-report.json >> snyk-summary.txt 2>/dev/null || echo "  ✅ No critical/high vulnerabilities found" >> snyk-summary.txt
+          
+          echo "------------------------------------------------" >> snyk-summary.txt
+          echo "RECOMMENDATIONS:"                               >> snyk-summary.txt
+          echo "------------------------------------------------" >> snyk-summary.txt
+          if [ "$TOTAL" -gt 0 ]; then
+            echo "  • View detailed report: snyk-report.html"     >> snyk-summary.txt
+            echo "  • Check Snyk Dashboard: https://app.snyk.io/" >> snyk-summary.txt
+            echo "  • Update base image to latest version"        >> snyk-summary.txt
+            echo "  • Review and apply security patches"          >> snyk-summary.txt
+          else
+            echo "  ✅ No vulnerabilities found - image is secure!" >> snyk-summary.txt
+          fi
+          echo "================================================" >> snyk-summary.txt
+          cat snyk-summary.txt
+
+      - name: Upload Enhanced Snyk Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: snyk-report
+          path: |
+            snyk-summary.txt
+            snyk-report.json
+            snyk-report.html
+
+  # =========================
+  # 🔍 TRIVY
+  # =========================
+  trivy:
+    runs-on: ubuntu-latest
+    needs: snyk
+    if: startsWith(github.ref, 'refs/heads/devsecops/')
+    steps:
+      - name: Download Docker Image Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Trivy Scan - Table (Console)
+        uses: aquasecurity/trivy-action@master
+        with:
+          input: image.tar
+          format: table
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
+      - name: Trivy Scan - JSON (Artifact)
+        uses: aquasecurity/trivy-action@master
+        with:
+          input: image.tar
+          format: json
+          output: trivy-report.json
+          severity: HIGH,CRITICAL
+          exit-code: 0
+
+      - name: Generate Trivy Summary Report
+        if: always()
+        run: |
+          echo "================================================" > trivy-summary.txt
+          echo "          TRIVY IMAGE SCAN REPORT              " >> trivy-summary.txt
+          echo "================================================" >> trivy-summary.txt
+          echo "Image     : backend:${{ github.sha }}"           >> trivy-summary.txt
+          echo "Branch    : ${{ github.ref_name }}"              >> trivy-summary.txt
+          echo "Commit    : ${{ github.sha }}"                   >> trivy-summary.txt
+          echo "Severity  : HIGH, CRITICAL"                     >> trivy-summary.txt
+          echo "Timestamp : $(date -u)"                         >> trivy-summary.txt
+          echo "------------------------------------------------" >> trivy-summary.txt
+          echo "" >> trivy-summary.txt
+          CRITICAL=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity=="CRITICAL")] | length' trivy-report.json 2>/dev/null || echo 0)
+          HIGH=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity=="HIGH")] | length' trivy-report.json 2>/dev/null || echo 0)
+          echo "SUMMARY:"                                        >> trivy-summary.txt
+          echo "  Critical : $CRITICAL"                         >> trivy-summary.txt
+          echo "  High     : $HIGH"                             >> trivy-summary.txt
+          echo "" >> trivy-summary.txt
+          echo "------------------------------------------------" >> trivy-summary.txt
+          echo "CRITICAL VULNERABILITIES:"                      >> trivy-summary.txt
+          echo "------------------------------------------------" >> trivy-summary.txt
+          jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity=="CRITICAL") |
+            "[CRITICAL] " + .VulnerabilityID +
+            "\n  Package    : " + .PkgName +
+            "\n  Installed  : " + .InstalledVersion +
+            "\n  Fixed In   : " + (.FixedVersion // "No fix available") +
+            "\n  Title      : " + (.Title // "N/A") +
+            "\n"' trivy-report.json >> trivy-summary.txt 2>/dev/null || echo "  No critical vulnerabilities found" >> trivy-summary.txt
+          echo "------------------------------------------------" >> trivy-summary.txt
+          echo "HIGH VULNERABILITIES:"                          >> trivy-summary.txt
+          echo "------------------------------------------------" >> trivy-summary.txt
+          jq -r '.Results[]?.Vulnerabilities[]? | select(.Severity=="HIGH") |
+            "[HIGH] " + .VulnerabilityID +
+            "\n  Package    : " + .PkgName +
+            "\n  Installed  : " + .InstalledVersion +
+            "\n  Fixed In   : " + (.FixedVersion // "No fix available") +
+            "\n  Title      : " + (.Title // "N/A") +
+            "\n"' trivy-report.json >> trivy-summary.txt 2>/dev/null || echo "  No high vulnerabilities found" >> trivy-summary.txt
+          echo "================================================" >> trivy-summary.txt
+          cat trivy-summary.txt
+
+      - name: Upload Trivy Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-report
+          path: |
+            trivy-summary.txt
+            trivy-report.json
+
+  # =========================
+  # 🛡️ STACKHAWK
+  # =========================
+  stackhawk:
+    runs-on: ubuntu-latest
+    needs: trivy
+    if: startsWith(github.ref, 'refs/heads/devsecops/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: StackHawk Scan
+        uses: stackhawk/hawkscan-action@v2
+        with:
+          apiKey: ${{ secrets.HAWK_API_KEY }}
+          hawk-scan-failure-threshold: high
+
+      - name: Upload StackHawk Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stackhawk-report
+          path: .hawk/
+
+  # =========================
+  # 🐳 DOCKER PUSH
+  # =========================
+  docker-push:
+    runs-on: ubuntu-latest
+    needs: [build, sonarqube]
+    if: github.ref == 'refs/heads/dev'
+    steps:
+      - name: Download Docker Image Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker Image
+        run: docker load -i image.tar
+
+      - name: Login DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Build & push image
-        if: github.event_name == 'push'
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
-            ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:${{ github.sha }}
-
-
-
-
-
-
-
-
-
-
-
+      - name: Push Docker Image
+        run: |
+          docker tag backend:${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/cloudnexus1-backend:latest
