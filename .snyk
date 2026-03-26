@@ -1,0 +1,19 @@
+# Snyk policy file
+version: v1.25.0
+ignore:
+  SNYK-JAVA-COMFASTERXMLJACKSONCORE-15365924:
+    - '*':
+        reason: No fix available in Spring Boot 3.x; requires major version upgrade to 4.0.0
+        expires: 2026-01-01T00:00:00.000Z
+  SNYK-JAVA-ORGSPRINGFRAMEWORK-15701845:
+    - '*':
+        reason: No fix available in Spring Boot 3.x; requires major version upgrade to 4.0.0
+        expires: 2026-01-01T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-15307822:
+    - '*':
+        reason: No fix available in Spring Boot 3.x compatible Tomcat version
+        expires: 2026-01-01T00:00:00.000Z
+  SNYK-JAVA-ORGAPACHETOMCATEMBED-15307781:
+    - '*':
+        reason: No fix available in Spring Boot 3.x compatible Tomcat version
+        expires: 2026-01-01T00:00:00.000Z

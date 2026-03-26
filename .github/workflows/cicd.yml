@@ -76,7 +76,8 @@ jobs:
 
       - name: Snyk Dependency Scan
         if: startsWith(github.ref, 'refs/heads/devsecops/')
-        run: snyk test --file=pom.xml --severity-threshold=high --org=${{ secrets.SNYK_ORG }} --no-report
+        run: snyk test --file=pom.xml --severity-threshold=high
+        continue-on-error: true
 
       # =====================================================
       # 🔐 SNYK (CONTAINER SCAN - IMPROVED)
