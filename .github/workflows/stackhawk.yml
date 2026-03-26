@@ -1,0 +1,6 @@
+app:
+  applicationId: your-app-id
+  env: dev
+
+scan:
+  baseUrl: http://13.201.109.105:8081
