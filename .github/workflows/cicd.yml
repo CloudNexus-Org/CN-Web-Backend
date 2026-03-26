@@ -4,10 +4,12 @@ on:
   push:
     branches:
       - dev
-      - devsecops/**
+      - devsecops/*
+      - master
   pull_request:
     branches:
       - dev
+      - master
 
 jobs:
   # =========================
@@ -70,7 +72,24 @@ jobs:
           -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
           -Dsonar.scm.provider=git \
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+          -Dsonar.qualitygate.wait=true \
+          -Dsonar.qualitygate.timeout=300 \
           2>&1 | tee sonarqube-scan.log
+
+      - name: Check Quality Gate
+        run: |
+          # Extract quality gate status from logs
+          if grep -q "QUALITY GATE STATUS: PASSED" sonarqube-scan.log; then
+            echo "✅ Quality Gate PASSED"
+            echo "QUALITY_GATE_STATUS=PASSED" >> $GITHUB_ENV
+          elif grep -q "QUALITY GATE STATUS: FAILED" sonarqube-scan.log; then
+            echo "❌ Quality Gate FAILED"
+            echo "QUALITY_GATE_STATUS=FAILED" >> $GITHUB_ENV
+            exit 1
+          else
+            echo "⚠️ Quality Gate status unknown"
+            echo "QUALITY_GATE_STATUS=UNKNOWN" >> $GITHUB_ENV
+          fi
 
       - name: Generate SonarQube Summary Report
         if: always()
@@ -82,6 +101,7 @@ jobs:
           echo "Branch    : ${{ github.ref_name }}"              >> sonarqube-report.txt
           echo "Commit    : ${{ github.sha }}"                   >> sonarqube-report.txt
           echo "Run       : ${{ github.run_number }}"            >> sonarqube-report.txt
+          echo "Quality Gate: ${QUALITY_GATE_STATUS:-UNKNOWN}"   >> sonarqube-report.txt
           echo "Timestamp : $(date -u)"                         >> sonarqube-report.txt
           echo "Dashboard : http://${{ secrets.SONAR_IP }}/dashboard?id=com.cloudnexus:backend" >> sonarqube-report.txt
           echo "------------------------------------------------" >> sonarqube-report.txt
@@ -131,6 +151,25 @@ jobs:
         run: |
           # Test and generate JSON report
           snyk container test backend:${{ github.sha }} --json > snyk-report.json || true
+          
+          # Check for critical/high vulnerabilities
+          CRITICAL=$(jq '[.vulnerabilities[]? | select(.severity=="critical")] | length' snyk-report.json 2>/dev/null || echo 0)
+          HIGH=$(jq '[.vulnerabilities[]? | select(.severity=="high")] | length' snyk-report.json 2>/dev/null || echo 0)
+          TOTAL_CRITICAL_HIGH=$((CRITICAL + HIGH))
+          
+          echo "Critical vulnerabilities: $CRITICAL"
+          echo "High vulnerabilities: $HIGH"
+          echo "Total Critical+High: $TOTAL_CRITICAL_HIGH"
+          
+          # Fail if critical/high vulnerabilities found
+          if [ "$TOTAL_CRITICAL_HIGH" -gt 0 ]; then
+            echo "❌ Security scan failed: Found $TOTAL_CRITICAL_HIGH critical/high vulnerabilities"
+            echo "SNYK_STATUS=FAILED" >> $GITHUB_ENV
+            exit 1
+          else
+            echo "✅ Security scan passed: No critical/high vulnerabilities found"
+            echo "SNYK_STATUS=PASSED" >> $GITHUB_ENV
+          fi
           
           # Monitor the image in Snyk UI (sends results to dashboard)
           snyk container monitor backend:${{ github.sha }} --project-name="CloudNexus-Backend-${{ github.ref_name }}" || true
@@ -224,20 +263,20 @@ jobs:
         with:
           name: docker-image
 
-      - name: Trivy Scan - Table (Console)
-        uses: aquasecurity/trivy-action@master
-        with:
-          input: image.tar
-          format: table
-          severity: HIGH,CRITICAL
-          exit-code: 0
-
-      - name: Trivy Scan - JSON (Artifact)
+      - name: Trivy Scan - Security Gate Check
         uses: aquasecurity/trivy-action@master
         with:
           input: image.tar
           format: json
           output: trivy-report.json
+          severity: HIGH,CRITICAL
+          exit-code: 1  # Fail pipeline if vulnerabilities found
+
+      - name: Trivy Scan - Table (Console)
+        uses: aquasecurity/trivy-action@master
+        with:
+          input: image.tar
+          format: table
           severity: HIGH,CRITICAL
           exit-code: 0
 
@@ -307,7 +346,7 @@ jobs:
         uses: stackhawk/hawkscan-action@v2
         with:
           apiKey: ${{ secrets.HAWK_API_KEY }}
-          hawk-scan-failure-threshold: high
+          hawk-scan-failure-threshold: medium  # Fail on medium+ vulnerabilities
 
       - name: Upload StackHawk Report
         uses: actions/upload-artifact@v4
@@ -321,9 +360,30 @@ jobs:
   # =========================
   docker-push:
     runs-on: ubuntu-latest
-    needs: [build, sonarqube]
-    if: github.ref == 'refs/heads/dev'
+    needs: [build, sonarqube, snyk, trivy, stackhawk]
+    if: |
+      (github.ref == 'refs/heads/dev' && needs.sonarqube.result == 'success') ||
+      (startsWith(github.ref, 'refs/heads/devsecops/') && 
+       needs.sonarqube.result == 'success' && 
+       needs.snyk.result == 'success' && 
+       needs.trivy.result == 'success' && 
+       needs.stackhawk.result == 'success')
     steps:
+      - name: Quality Gate Summary
+        run: |
+          echo "================================================"
+          echo "         🎯 QUALITY GATE SUMMARY               "
+          echo "================================================"
+          echo "✅ Build: SUCCESS"
+          echo "✅ SonarQube: ${{ needs.sonarqube.result }}"
+          if [[ "${{ github.ref }}" == refs/heads/devsecops/* ]]; then
+            echo "✅ Snyk: ${{ needs.snyk.result }}"
+            echo "✅ Trivy: ${{ needs.trivy.result }}"
+            echo "✅ StackHawk: ${{ needs.stackhawk.result }}"
+          fi
+          echo "================================================"
+          echo "🚀 All quality gates passed! Proceeding with Docker push..."
+          echo "================================================"
       - name: Download Docker Image Artifact
         uses: actions/download-artifact@v4
         with:
