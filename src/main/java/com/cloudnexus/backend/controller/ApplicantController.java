@@ -14,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/applicants")
+@CrossOrigin(origins = {"http://localhost:3000", "http://13.201.109.105:3000"})
 @RequiredArgsConstructor
 public class ApplicantController {
 
