@@ -3,5 +3,61 @@ app:
   env: development
   host: http://13.201.109.105:8081
 
+hawk:
+  spider:
+    base: true
+    maxDurationMinutes: 5
+    ajaxBrowser: CHROME_HEADLESS
+  startupTimeoutMinutes: 5
+  scan:
+    concurrentRequests: '20'
+    throttlePassiveBacklog: '10000'
+
 scan:
   baseUrl: http://13.201.109.105:8081
+  paths:
+    # Health
+    - path: /health
+      methods: [GET]
+
+    # Jobs
+    - path: /api/jobs
+      methods: [GET, POST]
+    - path: /api/jobs/active
+      methods: [GET]
+    - path: /api/jobs/{id}
+      methods: [GET, PUT, DELETE]
+
+    # Applicants
+    - path: /api/applicants
+      methods: [GET, POST]
+    - path: /api/applicants/{id}
+      methods: [GET, DELETE]
+    - path: /api/applicants/job/{jobId}
+      methods: [GET]
+    - path: /api/applicants/{id}/status
+      methods: [PATCH]
+
+    # Leads
+    - path: /api/leads
+      methods: [GET, POST]
+    - path: /api/leads/{id}
+      methods: [GET, PUT, DELETE]
+    - path: /api/leads/{id}/status
+      methods: [PATCH]
+
+    # Blog
+    - path: /api/blog
+      methods: [GET, POST]
+    - path: /api/blog/published
+      methods: [GET]
+    - path: /api/blog/{id}
+      methods: [GET, PUT, DELETE]
+    - path: /api/blog/slug/{slug}
+      methods: [GET]
+    - path: /api/blog/{id}/view
+      methods: [POST]
+
+    # Dashboard
+    - path: /api/dashboard/stats
+      methods: [GET]
