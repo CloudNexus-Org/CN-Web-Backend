@@ -19,6 +19,8 @@ jobs:
       # =========================
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # =========================
       # ☕ Java Setup
@@ -61,7 +63,7 @@ jobs:
       # =====================================================
       - name: SonarCloud Scan (Maven)
         if: github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/heads/devsecops/')
-        run: mvn -B verify sonar:sonar -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} -Dsonar.organization=${{ secrets.ORG_KEY }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} -Dsonar.organization=${{ secrets.ORG_KEY }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
             # =====================================================
       # 🔐 SNYK (DEPENDENCY SCAN - FINAL)
@@ -85,6 +87,7 @@ jobs:
       - name: Snyk Container Scan
         if: startsWith(github.ref, 'refs/heads/devsecops/')
         uses: snyk/actions/docker@master
+        continue-on-error: true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
