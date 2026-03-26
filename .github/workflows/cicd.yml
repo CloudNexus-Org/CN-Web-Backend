@@ -61,15 +61,10 @@ jobs:
       # =====================================================
       - name: SonarCloud Scan (Maven)
         if: startsWith(github.ref, 'refs/heads/devsecops/')
-        run: |
-          mvn -B verify sonar:sonar \
-          -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
-          -Dsonar.organization=${{ secrets.ORG_KEY }} \
-          -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} -Dsonar.organization=${{ secrets.ORG_KEY }} -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }}
 
       # =====================================================
-      # 🔐 SNYK (DEPENDENCY SCAN)
+      # 🔐 SNYK (DEPENDENCY SCAN - FIXED)
       # =====================================================
       - name: Install Snyk CLI
         if: startsWith(github.ref, 'refs/heads/devsecops/')
@@ -81,7 +76,7 @@ jobs:
 
       - name: Snyk Dependency Scan
         if: startsWith(github.ref, 'refs/heads/devsecops/')
-        run: snyk test --severity-threshold=high
+        run: snyk test --severity-threshold=high --org=${{ secrets.SNYK_ORG }}
 
       # =====================================================
       # 🔐 SNYK (CONTAINER SCAN)
