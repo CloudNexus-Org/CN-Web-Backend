@@ -63,7 +63,7 @@ jobs:
         run: |
           mvn verify sonar:sonar \
             -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
-            -Dsonar.host.url=http://${{ secrets.SONAR_IP }}:9000 \
+            -Dsonar.host.url=http://${{ secrets.SONAR_IP }} \
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.qualitygate.wait=true 2>&1 | tee sonarqube-report.txt || true
 
