@@ -64,12 +64,13 @@ jobs:
       - name: SonarQube Scan
         run: |
           mvn verify sonar:sonar \
-            -Dsonar.projectKey=${{ secrets.PROJECT_KEY }} \
-            -Dsonar.host.url=http://${{ secrets.SONAR_IP }} \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.scm.provider=git \
-            -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
-            2>&1 | tee sonarqube-scan.log
+          -Dsonar.projectKey=backend \
+          -Dsonar.projectName=backend \
+          -Dsonar.host.url=http://${{ secrets.SONAR_IP }} \
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.scm.provider=git \
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+          2>&1 | tee sonarqube-scan.log
 
       - name: Generate SonarQube Summary Report
         if: always()
@@ -77,12 +78,12 @@ jobs:
           echo "================================================" > sonarqube-report.txt
           echo "       SONARQUBE SCAN REPORT - CloudNexus       " >> sonarqube-report.txt
           echo "================================================" >> sonarqube-report.txt
-          echo "Project   : ${{ secrets.PROJECT_KEY }}"          >> sonarqube-report.txt
+          echo "Project   : com.cloudnexus:backend"              >> sonarqube-report.txt
           echo "Branch    : ${{ github.ref_name }}"              >> sonarqube-report.txt
           echo "Commit    : ${{ github.sha }}"                   >> sonarqube-report.txt
           echo "Run       : ${{ github.run_number }}"            >> sonarqube-report.txt
           echo "Timestamp : $(date -u)"                         >> sonarqube-report.txt
-          echo "Dashboard : http://${{ secrets.SONAR_IP }}/dashboard?id=${{ secrets.PROJECT_KEY }}" >> sonarqube-report.txt
+          echo "Dashboard : http://${{ secrets.SONAR_IP }}/dashboard?id=com.cloudnexus:backend" >> sonarqube-report.txt
           echo "------------------------------------------------" >> sonarqube-report.txt
           echo "" >> sonarqube-report.txt
           echo "--- SCAN OUTPUT ---" >> sonarqube-report.txt
