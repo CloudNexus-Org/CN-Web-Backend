@@ -16,6 +16,9 @@
   <properties>
     <java.version>21</java.version>
     <postgresql.version>42.7.7</postgresql.version>
+    <tomcat.version>11.0.9</tomcat.version>
+    <spring-framework.version>6.2.11</spring-framework.version>
+    <jackson-bom.version>2.19.1</jackson-bom.version>
   </properties>
   <dependencies>
     <!-- Web (REST API) -->
