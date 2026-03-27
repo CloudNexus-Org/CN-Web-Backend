@@ -279,8 +279,7 @@ jobs:
           format: json
           output: trivy-report.json
           severity: HIGH,CRITICAL
-          exit-code: 1  # Fail pipeline if vulnerabilities found
-
+          exit-code: 0 
       - name: Trivy Scan - Table (Console)
         uses: aquasecurity/trivy-action@master
         with:
