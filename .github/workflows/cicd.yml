@@ -130,7 +130,10 @@ jobs:
   snyk:
     runs-on: ubuntu-latest
     needs: sonarqube
-    if: startsWith(github.ref, 'refs/heads/devsecops/')
+    if: |
+      github.ref == 'refs/heads/dev' ||
+      github.ref == 'refs/heads/master' ||
+      startsWith(github.ref, 'refs/heads/devsecops/')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
