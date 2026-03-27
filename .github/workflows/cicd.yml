@@ -49,7 +49,10 @@ jobs:
   sonarqube:
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/heads/devsecops/')
+    if: |
+      github.ref == 'refs/heads/dev' ||
+      github.ref == 'refs/heads/master' ||
+      startsWith(github.ref, 'refs/heads/devsecops/')
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -69,7 +72,7 @@ jobs:
           -Dsonar.projectKey=backend \
           -Dsonar.projectName=backend \
           -Dsonar.host.url=http://${{ secrets.SONAR_IP }} \
-          -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
           -Dsonar.scm.provider=git \
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
           -Dsonar.qualitygate.wait=true \
