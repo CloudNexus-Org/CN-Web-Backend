@@ -262,7 +262,10 @@ jobs:
   trivy:
     runs-on: ubuntu-latest
     needs: snyk
-    if: startsWith(github.ref, 'refs/heads/devsecops/')
+    if: |
+      github.ref == 'refs/heads/dev' ||
+      github.ref == 'refs/heads/master' ||
+      startsWith(github.ref, 'refs/heads/devsecops/')
     steps:
       - name: Download Docker Image Artifact
         uses: actions/download-artifact@v4
@@ -371,12 +374,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, sonarqube, snyk, trivy, stackhawk]
     if: |
-      (github.ref == 'refs/heads/dev' && needs.sonarqube.result == 'success') ||
-      (startsWith(github.ref, 'refs/heads/devsecops/') && 
-       needs.sonarqube.result == 'success' && 
-       needs.snyk.result == 'success' && 
-       needs.trivy.result == 'success' && 
-       needs.stackhawk.result == 'success')
+      (
+        (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/master') &&
+        needs.sonarqube.result == 'success'
+      ) ||
+      (
+        startsWith(github.ref, 'refs/heads/devsecops/') &&
+        needs.sonarqube.result == 'success' &&
+        needs.snyk.result == 'success' &&
+        needs.trivy.result == 'success' &&
+        needs.stackhawk.result == 'success'
+      )
     steps:
       - name: Quality Gate Summary
         run: |
