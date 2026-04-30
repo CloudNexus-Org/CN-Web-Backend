@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum JobApplicationStatus {
+  PENDING
+  APPROVED
+}
+
+model User {
+  id              String              @id @default(cuid())
+  email           String              @unique
+  passwordHash    String
+  name            String
+  role            UserRole            @default(USER)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  applications    JobApplication[]
+  blogPosts       BlogPost[]
+  twoFAChallenges AdminTwoFAChallenge[]
+}
+
+model JobPosting {
+  id               String   @id @default(cuid())
+  title            String
+  slug             String   @unique
+  department       String
+  location         String   @default("Remote")
+  employmentType   String   @default("Full-time")
+  tagline          String   @default("")
+  experience       String   @default("2+ years")
+  description      Json
+  profileSections  Json
+  published        Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([published, createdAt])
+}
+
+model JobApplication {
+  id              String                 @id @default(cuid())
+  userId          String
+  user            User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobSlug         String
+  jobTitle        String
+  fullName        String
+  email           String
+  phone           String
+  currentCompany  String?
+  ctc             String?
+  experience      String?
+  resumeFileName  String?
+  resumePath      String?
+  status          JobApplicationStatus   @default(PENDING)
+  createdAt       DateTime               @default(now())
+
+  @@index([userId])
+  @@index([jobSlug])
+  @@index([status])
+}
+
+model BlogPost {
+  id           String   @id @default(cuid())
+  title        String
+  slug         String   @unique
+  excerpt      String
+  content      String
+  category     String?
+  coverImage   String?
+  /** Display name shown on the public blog (set per post in admin). */
+  authorName   String?
+  /** Relative path under uploads/ or absolute URL for author avatar. */
+  authorImage  String?
+  published    Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  authorId     String?
+  author       User?    @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+}
+
+model ContactInquiry {
+  id             String   @id @default(cuid())
+  fullName       String
+  companyName    String?
+  email          String
+  phone          String?
+  interestedIn   String
+  estimatedBudget String?
+  heardFrom      String?
+  projectDetails String
+  createdAt      DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model AdminTwoFAChallenge {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  codeHash   String
+  expiresAt  DateTime
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, expiresAt])
+}
