@@ -1,0 +1,38 @@
+# Local / demo: API + PostgreSQL (Prisma expects DATABASE_URL)
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cn
+      POSTGRES_PASSWORD: cn_dev_password
+      POSTGRES_DB: cloudnexus
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cn -d cloudnexus"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: postgresql://cn:cn_dev_password@db:5432/cloudnexus?schema=public
+      JWT_SECRET: ${JWT_SECRET:-change_me_min_32_chars_for_local_dev_only}
+      PORT: "4000"
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - uploads_data:/app/uploads
+
+volumes:
+  pgdata:
+  uploads_data:
