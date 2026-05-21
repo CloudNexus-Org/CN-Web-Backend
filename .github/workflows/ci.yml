@@ -49,12 +49,15 @@ jobs:
           DH_REPO: ${{ vars.DOCKERHUB_REPO }}
         run: |
           REPO="${DH_REPO:-cn-backend}"
+          # Trim CR/LF/spaces — hidden chars break Trivy/Docker "could not parse reference"
+          DH_USER=$(printf '%s' "$DH_USER" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+          REPO=$(printf '%s' "$REPO" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
           if [ -n "$DH_USER" ]; then
-            echo "full=${DH_USER}/${REPO}" >> "$GITHUB_OUTPUT"
-            echo "can_push=true" >> "$GITHUB_OUTPUT"
+            printf '%s\n' "full=${DH_USER}/${REPO}" >> "$GITHUB_OUTPUT"
+            printf '%s\n' "can_push=true" >> "$GITHUB_OUTPUT"
           else
-            echo "full=cn-backend-ci/${REPO}" >> "$GITHUB_OUTPUT"
-            echo "can_push=false" >> "$GITHUB_OUTPUT"
+            printf '%s\n' "full=cn-backend-ci/${REPO}" >> "$GITHUB_OUTPUT"
+            printf '%s\n' "can_push=false" >> "$GITHUB_OUTPUT"
             echo "::warning::DOCKERHUB_USERNAME empty — using local tag only; set secrets to push."
           fi
 
@@ -76,14 +79,16 @@ jobs:
           tags: |
             ${{ steps.image.outputs.full }}:latest
             ${{ steps.image.outputs.full }}:${{ github.sha }}
+            cn-backend:ci-scan
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      # Trivy scans a fixed local name (avoids parse errors from masked / odd registry refs)
       - name: Run Trivy vulnerability scanner on image
         uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: image
-          image-ref: ${{ steps.image.outputs.full }}:${{ github.sha }}
+          image-ref: cn-backend:ci-scan
           scanners: vuln
           severity: CRITICAL,HIGH,MEDIUM
           format: table

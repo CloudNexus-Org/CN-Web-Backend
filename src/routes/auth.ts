@@ -57,6 +57,7 @@ async function sendAdminOtpResponse(
         expiresAt: challenge.expiresAt.toISOString(),
         message: messageWhenEmailed,
         delivery: "email",
+        ...(exposeDevCode ? { devCode: code } : {}),
       });
       return;
     }

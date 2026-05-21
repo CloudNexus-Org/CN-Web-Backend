@@ -1,4 +1,4 @@
-import "./env.js";
+import "./env";
 import path from "path";
 import express from "express";
 import cors from "cors";
@@ -82,7 +82,14 @@ app.use((_req, res) => {
   res.status(404).json({ error: "Not found" });
 });
 
-app.listen(port, () => {
-  console.log(`API http://localhost:${port}`);
-  console.log(`CORS origins: ${corsOrigins.join(", ")}`);
-});
+
+
+if (process.env.NODE_ENV !== "test") {
+  app.listen(port, () => {
+    console.log(`API http://localhost:${port}`);
+    console.log(`CORS origins: ${corsOrigins.join(", ")}`);
+  });
+}
+
+module.exports = app;
+// Reload trigger

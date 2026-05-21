@@ -3,7 +3,6 @@ import fs from "fs";
 import { Router } from "express";
 import multer from "multer";
 import { prisma } from "../lib/prisma.js";
-import { authMiddleware, type AuthRequest } from "../middleware/auth.js";
 
 const router = Router();
 const uploadRoot = path.join(process.cwd(), "uploads", "resumes");
@@ -21,12 +20,11 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 2 * 1024 * 1024 },
 });
 
 router.post(
   "/",
-  authMiddleware,
   (req, res, next) => {
     upload.single("resume")(req, res, (err) => {
       if (err) {
@@ -38,10 +36,9 @@ router.post(
       next();
     });
   },
-  async (req: AuthRequest, res) => {
-    const userId = req.userId!;
-    const f = req.file;
+  async (req, res) => {
     const b = req.body as Record<string, string | undefined>;
+    const f = req.file;
     if (!b.jobTitle || !b.jobSlug) {
       res.status(400).json({ error: "jobTitle and jobSlug are required" });
       return;
@@ -58,7 +55,7 @@ router.post(
       : null;
     const row = await prisma.jobApplication.create({
       data: {
-        userId,
+        userId: null,
         jobSlug: String(b.jobSlug),
         jobTitle: String(b.jobTitle),
         fullName: String(b.fullName).trim(),

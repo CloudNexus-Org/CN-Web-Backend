@@ -50,8 +50,8 @@ model JobPosting {
 
 model JobApplication {
   id              String                 @id @default(cuid())
-  userId          String
-  user            User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId          String?
+  user            User?                  @relation(fields: [userId], references: [id], onDelete: SetNull)
   jobSlug         String
   jobTitle        String
   fullName        String
@@ -65,7 +65,7 @@ model JobApplication {
   status          JobApplicationStatus   @default(PENDING)
   createdAt       DateTime               @default(now())
 
-  @@index([userId])
+  @@index([userId], map: "JobApplication_userId_idx")
   @@index([jobSlug])
   @@index([status])
 }
