@@ -31,7 +31,9 @@ npm run dev
 | `npm run build` | Compile TypeScript → `dist/` |
 | `npm start` | Run compiled app (`node dist/index.js`) |
 | `npm run db:generate` | Regenerate Prisma Client after schema changes |
-| `npm run db:push` | Push schema to DB (dev / prototyping) |
+| `npm run db:push` | Push schema to DB (dev / prototyping only) |
+| `npm run db:migrate` | Apply pending migrations (`prisma migrate deploy`) |
+| `npm run db:migrate:dev` | Create/apply migrations in development |
 | `npm run db:studio` | Open Prisma Studio GUI |
 | `npm run admin:create` | Create an admin user (see script output) |
 
@@ -96,13 +98,19 @@ The frontend often runs on `http://localhost:3000` while you may open `http://12
 ```
 backend/
 ├── prisma/
-│   └── schema.prisma
+│   ├── schema.prisma
+│   └── migrations/        # versioned schema history (use db:migrate in prod)
+├── scripts/
+│   └── copy-assets.mjs    # copies src/data → dist/data on build
 ├── src/
-│   ├── index.ts           # Express app entry
-│   ├── env.ts
+│   ├── index.ts           # entry: validate env, create app, start server
+│   ├── app.ts             # Express app factory (routes + middleware)
+│   ├── server.ts          # HTTP listener
+│   ├── env.ts             # dotenv loader
+│   ├── config/            # env validation, CORS helpers
 │   ├── lib/
-│   ├── middleware/        # auth, admin 2FA
-│   ├── routes/            # route modules
+│   ├── middleware/        # auth, error handler, rate limiter
+│   ├── routes/            # route modules (+ /health, /health/ready)
 │   └── scripts/           # e.g. create-admin
 ├── uploads/               # generated at runtime (gitignored)
 ├── package.json
