@@ -3,20 +3,25 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { prisma } from "../lib/prisma.js";
 import { isSmtpConfigured, sendAdminOtpEmail } from "../lib/mailer.js";
-import { authMiddleware, requireAdmin2FA, type AuthRequest, type UserRole } from "../middleware/auth.js";
+import {
+  authMiddleware,
+  requireAdmin2FA,
+  type AuthRequest,
+  type UserRole,
+} from "../middleware/auth.js";
 
 const router = Router();
 const ROUNDS = 10;
 const OTP_EXPIRY_MINUTES = 10;
 
-function signToken(
-  userId: string,
-  role: UserRole,
-  admin2fa: boolean,
-): string {
-  return jwt.sign({ sub: userId, role, admin2fa }, process.env.JWT_SECRET as string, {
-    expiresIn: "7d",
-  });
+function signToken(userId: string, role: UserRole, admin2fa: boolean): string {
+  return jwt.sign(
+    { sub: userId, role, admin2fa },
+    process.env.JWT_SECRET as string,
+    {
+      expiresIn: "7d",
+    },
+  );
 }
 
 function makeOtpCode(): string {
@@ -87,7 +92,9 @@ async function sendAdminOtpResponse(
   }
 
   if (exposeDevCode) {
-    console.log(`[ADMIN 2FA] SMTP not configured; ADMIN_OTP_EXPOSE_DEV_CODE=true — OTP for ${userEmail}: ${code}`);
+    console.log(
+      `[ADMIN 2FA] SMTP not configured; ADMIN_OTP_EXPOSE_DEV_CODE=true — OTP for ${userEmail}: ${code}`,
+    );
     res.status(httpStatus).json({
       challengeId: challenge.id,
       expiresAt: challenge.expiresAt.toISOString(),
@@ -112,9 +119,7 @@ router.post("/register", async (req, res) => {
     name?: string;
   };
   if (!email || !password || !name) {
-    res
-      .status(400)
-      .json({ error: "name, email, and password are required" });
+    res.status(400).json({ error: "name, email, and password are required" });
     return;
   }
   if (String(password).length < 6) {
@@ -122,9 +127,13 @@ router.post("/register", async (req, res) => {
     return;
   }
   const emailLower = String(email).toLowerCase();
-  const existing = await prisma.user.findUnique({ where: { email: emailLower } });
+  const existing = await prisma.user.findUnique({
+    where: { email: emailLower },
+  });
   if (existing) {
-    res.status(409).json({ error: "An account with this email already exists" });
+    res
+      .status(409)
+      .json({ error: "An account with this email already exists" });
     return;
   }
   const passwordHash = await bcrypt.hash(String(password), ROUNDS);
@@ -217,9 +226,13 @@ router.post("/admin/signup", async (req, res) => {
   }
 
   const emailLower = String(email).toLowerCase().trim();
-  const existing = await prisma.user.findUnique({ where: { email: emailLower } });
+  const existing = await prisma.user.findUnique({
+    where: { email: emailLower },
+  });
   if (existing) {
-    res.status(409).json({ error: "An account with this email already exists" });
+    res
+      .status(409)
+      .json({ error: "An account with this email already exists" });
     return;
   }
 
@@ -247,7 +260,10 @@ router.post("/admin/signup", async (req, res) => {
 });
 
 router.post("/admin/verify-2fa", async (req, res) => {
-  const { challengeId, code } = req.body as { challengeId?: string; code?: string };
+  const { challengeId, code } = req.body as {
+    challengeId?: string;
+    code?: string;
+  };
   if (!challengeId || !code) {
     res.status(400).json({ error: "challengeId and code are required" });
     return;
@@ -300,16 +316,31 @@ router.get("/me", authMiddleware, async (req: AuthRequest, res) => {
     res.status(401).json({ error: "User not found" });
     return;
   }
-  res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
+  res.json({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  });
 });
 
-router.get("/admin/me", authMiddleware, requireAdmin2FA, async (req: AuthRequest, res) => {
-  const user = await prisma.user.findUnique({ where: { id: req.userId } });
-  if (!user) {
-    res.status(401).json({ error: "User not found" });
-    return;
-  }
-  res.json({ id: user.id, email: user.email, name: user.name, role: user.role });
-});
+router.get(
+  "/admin/me",
+  authMiddleware,
+  requireAdmin2FA,
+  async (req: AuthRequest, res) => {
+    const user = await prisma.user.findUnique({ where: { id: req.userId } });
+    if (!user) {
+      res.status(401).json({ error: "User not found" });
+      return;
+    }
+    res.json({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    });
+  },
+);
 
 export default router;

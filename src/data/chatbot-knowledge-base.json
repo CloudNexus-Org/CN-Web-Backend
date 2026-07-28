@@ -1,0 +1,941 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-07-06",
+    "description": "Complete CloudNexus company knowledge base for the rule-based chatbot AI model",
+    "source": "Compiled from all website pages and components"
+  },
+
+  "company": {
+    "name": "Cloud Nexus",
+    "legalName": "CloudNexus Technologies",
+    "tagline": "Custom Software Development & IT Solutions Company",
+    "founded": "19 January 2025",
+    "type": "Full-service IT solutions and software development company",
+    "description": "Cloud Nexus is a technology company that transforms ideas into powerful digital products. Founded in January 2025, we bring together talented engineers, designers, and strategists to deliver exceptional software solutions. We specialize in progressive IT solutions, cloud transformation, AI-driven automation, and enterprise consulting.",
+    "mission": "Developing industry-leading IT solutions; transforming outdated methodologies; driving digital innovation through AI, cloud & automation; empowering businesses of all sizes.",
+    "vision": "To be the global leader in IT solutions and digital product innovation, empowering businesses with progressive technology that enhances efficiency, scalability, and growth.",
+    "website": "https://cloudnexus.in",
+    "linkedIn": "https://www.linkedin.com/company/cloudnexusorg/posts/?feedView=all",
+    "instagram": "https://www.instagram.com/cloudnexus.in/"
+  },
+
+  "contact": {
+    "email": "work@cloudnexus.in",
+    "hrEmail": "hr@cloudnexus.in",
+    "phone": "+91 87938 30447",
+    "whatsapp": "+918793830447",
+    "workingHours": "Monday to Saturday, 9 AM to 7 PM IST",
+    "responseTime": "Within 24 hours",
+    "freeConsultation": {
+      "description": "Book a free 30-minute strategy session with our senior architects",
+      "url": "/resources/free-consultation",
+      "calendly": "https://calendly.com/pushprajgurjar358/30min",
+      "includes": [
+        "Expert strategy session with senior solutions architect",
+        "Custom project roadmap with milestones and budget estimates",
+        "NDA protected — your ideas are completely safe",
+        "Zero obligation — no strings attached"
+      ]
+    },
+    "contactForm": "/resources/contact",
+    "support": "/resources/support"
+  },
+
+  "offices": [
+    {
+      "city": "Bhopal",
+      "state": "Madhya Pradesh",
+      "country": "India",
+      "type": "Headquarters",
+      "address": "Plot No 20, Kusturi Arched, Barrai, Bhopal, MP 462042, India",
+      "phone": "+91 87938 30447"
+    },
+    {
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "country": "India",
+      "type": "Development Center",
+      "address": "Hitech City, Hyderabad, Telangana, India",
+      "phone": "+91 87938 30447"
+    },
+    {
+      "city": "Bengaluru",
+      "state": "Karnataka",
+      "country": "India",
+      "type": "Technology Hub",
+      "address": "2nd Stage, BTM Layout, Bengaluru, Karnataka 560076, India",
+      "phone": "+91 87938 30447"
+    }
+  ],
+
+  "stats": {
+    "yearsInBusiness": "1+",
+    "projectsDelivered": "200+",
+    "engineers": "90+",
+    "seniorDevelopers": "20+",
+    "industriesServed": "15+",
+    "globalClients": "10+",
+    "clientSatisfaction": "98%",
+    "clientRetention": "98%",
+    "officeLocations": 3,
+    "specializedSquads": 4,
+    "glassdoorRating": "4.8",
+    "uniquePerks": "12+",
+    "insuranceCover": "₹2 Crore"
+  },
+
+  "coreValues": [
+    {
+      "title": "Innovation First",
+      "description": "We push boundaries and embrace cutting-edge technologies to solve complex problems."
+    },
+    {
+      "title": "Client Success",
+      "description": "Your success is our success. We measure ourselves by the impact we create for your business."
+    },
+    {
+      "title": "Transparency",
+      "description": "Open communication, honest timelines, and no surprises — that is how we build trust."
+    },
+    {
+      "title": "Quality Obsession",
+      "description": "Every line of code, every pixel, and every interaction is crafted with precision and care."
+    },
+    {
+      "title": "Respect Individuality",
+      "description": "We respect individual values and support leading changes. Our culture celebrates diverse perspectives."
+    },
+    {
+      "title": "Integrity",
+      "description": "We honor valuable contributions, building lasting associations based on trust. We do what we say."
+    },
+    {
+      "title": "Progressive Learning",
+      "description": "We inspire, innovate, and evolve individual curiosity. Continuous learning is embedded in our DNA."
+    },
+    {
+      "title": "Excellence in Work",
+      "description": "We empower businesses through our commitment to delivering outstanding results in every project."
+    }
+  ],
+
+  "leadership": [
+    {
+      "name": "Kaustubh Singh",
+      "role": "Founder & CEO",
+      "focus": ["Strategic Vision", "Business Growth", "Innovation"],
+      "quote": "Building CloudNexus is not just about technology — it is about empowering businesses to unlock their full potential through innovation and trust."
+    },
+    {
+      "name": "Yash Singh",
+      "role": "Chief Technology Officer",
+      "focus": ["Tech Strategy", "Architecture", "R&D"],
+      "quote": "Great technology is invisible — it just works. Our job is to architect systems that scale effortlessly and adapt to tomorrow's challenges."
+    },
+    {
+      "name": "Aryan Patel",
+      "role": "Chief Marketing Officer",
+      "focus": ["Brand Strategy", "Growth Marketing", "Client Acquisition"],
+      "quote": "A great product deserves a great story. We make sure CloudNexus reaches the right people with the right message at the right time."
+    }
+  ],
+
+  "teams": [
+    {
+      "name": "Beyonders",
+      "department": "Development",
+      "leader": "Saurabh Patle",
+      "description": "Building end-to-end web and mobile applications with modern tech stacks.",
+      "techStack": ["React", "Next.js", "Node.js", "TypeScript", "Java", "Spring Boot", "Selenium", "PostgreSQL"]
+    },
+    {
+      "name": "Eternals",
+      "department": "Data",
+      "leader": "Arhan Mansoori",
+      "description": "Transforming raw data into actionable insights through analytics and ML models.",
+      "techStack": ["Python", "TensorFlow", "SQL", "Power BI", "Apache Spark", "ETL"]
+    },
+    {
+      "name": "Ariba",
+      "department": "DevOps",
+      "leader": "Tabasum Khan",
+      "description": "Managing cloud infrastructure, CI/CD pipelines, and deployment automation.",
+      "techStack": ["AWS", "Docker", "Kubernetes", "CI/CD", "Terraform", "Linux"]
+    }
+  ],
+
+  "services": {
+    "overview": "CloudNexus offers 20+ technology services organized into 3 main categories: Intelligent Automation, Software Engineering, and Digital Automation.",
+    "url": "/services",
+    "categories": [
+      {
+        "id": "intelligent-automation",
+        "name": "Intelligent Automation",
+        "description": "Harness AI, machine learning, and next-gen technologies to unlock efficiencies and automate complex workflows.",
+        "services": [
+          {
+            "name": "AI, ML & Data Science",
+            "url": "/services/ai-ml-data-science",
+            "description": "From predictive models and natural language processing to computer vision and smart automation.",
+            "subServices": [
+              "Machine Learning Solutions",
+              "Generative AI & LLMs",
+              "Predictive Analytics",
+              "Data Engineering & Pipelines",
+              "Computer Vision",
+              "NLP & Conversational AI"
+            ],
+            "highlights": ["Machine learning models", "NLP & chatbots", "Data pipelines"]
+          },
+          {
+            "name": "Digital Transformation",
+            "url": "/services/digital-transformation",
+            "description": "Revitalize outdated systems, streamline manual processes, and integrate modern tech stacks.",
+            "subServices": [
+              "Architecture Modernization",
+              "Technology Modernization",
+              "UI/UX Modernization",
+              "Integration Modernization",
+              "Data Engineering & AI",
+              "Product Re-engineering"
+            ],
+            "highlights": ["Legacy modernization", "Process automation", "Change management"]
+          },
+          {
+            "name": "Cybersecurity & Compliance",
+            "url": "/services/cybersecurity-compliance",
+            "description": "End-to-end security assessments, proactive threat detection, and compliance readiness for SOC 2, HIPAA, GDPR.",
+            "subServices": [
+              "Security Assessment & Pen Testing",
+              "Data Protection & Encryption",
+              "Threat Monitoring & SOC",
+              "Compliance & Regulatory Frameworks",
+              "Incident Response & Recovery",
+              "Infrastructure & Cloud Security"
+            ],
+            "highlights": ["Penetration testing", "Compliance frameworks", "Threat detection"]
+          },
+          {
+            "name": "Technology Consulting",
+            "url": "/services/technology-consulting",
+            "description": "Strategic advisory across big data, digital experience, IoT, AR, and conversational AI.",
+            "subServices": [
+              "Big Data Consulting",
+              "Digital Experience Consulting",
+              "AI & Data Science Consulting",
+              "Chatbot Consulting",
+              "IoT Consulting",
+              "Augmented Reality Consulting"
+            ],
+            "highlights": ["AI & data consulting", "IoT strategy", "AR consulting"]
+          }
+        ]
+      },
+      {
+        "id": "software-engineering",
+        "name": "Software Engineering",
+        "description": "Craft robust mobile apps, high-performance web platforms, and enterprise-grade software.",
+        "services": [
+          {
+            "name": "Mobile App Development",
+            "url": "/services/mobile-app-development",
+            "description": "Pixel-perfect native and cross-platform apps for iOS & Android.",
+            "subServices": ["iOS App Development", "Android App Development", "Flutter Development", "React Native Development", "Progressive Web Apps"],
+            "highlights": ["React Native & Flutter", "Native iOS/Android", "App Store optimization"]
+          },
+          {
+            "name": "Web Development",
+            "url": "/services/web-development",
+            "description": "Blazing-fast, secure, and fully responsive web experiences.",
+            "subServices": ["Custom Website Development", "CMS Website Development", "Responsive Website Design", "E-Commerce Website Development", "Single Page App Development", "Progressive Web App Development"],
+            "highlights": ["Next.js & React", "Progressive Web Apps", "Performance optimization"]
+          },
+          {
+            "name": "Software Development",
+            "url": "/services/software-development",
+            "description": "Complete lifecycle software engineering from enterprise applications to API ecosystems.",
+            "subServices": ["Custom Software", "Enterprise Software", "Custom CRM Development", "Software Product Development", "Legacy System Modernization", "Data Analytics & Information"],
+            "highlights": ["Enterprise apps", "API development", "System integration"]
+          },
+          {
+            "name": "MVP Development",
+            "url": "/services/mvp-development",
+            "description": "Validate fast with lean prototypes, single-feature MVPs, or full product builds.",
+            "subServices": ["Prototype Design", "Single Feature MVP", "MVP Build", "MVP to Full Scale", "MVP Improvement", "MVP Consulting"],
+            "highlights": ["Prototype design", "MVP build & scale", "MVP consulting"]
+          },
+          {
+            "name": "Hire Dedicated Developers",
+            "url": "/services/hire-dedicated-developers",
+            "description": "Plug in pre-vetted senior talent when you need it — from individual specialists to engineering pods.",
+            "subServices": ["Hire Mobile App Developers", "Hire Front-End Developers", "Hire Back-End Developers", "Hire Database Developers", "Hire Digital Marketing Experts", "Hire eCommerce & CMS Experts"],
+            "highlights": ["Staff augmentation", "Dedicated teams", "Flexible models"]
+          },
+          {
+            "name": "UI/UX Design",
+            "url": "/services/ui-ux-design",
+            "description": "Research-backed, conversion-driven design blending intuitive usability with contemporary aesthetics.",
+            "subServices": ["UI/UX Web Design", "UI/UX Mobile Design", "Visual Design", "Interaction Design", "Design Testing", "UI/UX Consulting"],
+            "highlights": ["Design systems", "User research", "Prototyping & testing"]
+          },
+          {
+            "name": "SaaS Development",
+            "url": "/services/saas-development",
+            "description": "Purpose-built multi-tenant platforms with flexible billing and cloud-native infrastructure.",
+            "subServices": ["Custom SaaS Platform", "SaaS UI/UX Design", "SaaS Mobile Solutions", "Subscription & Billing", "SaaS Security & Compliance", "SaaS API & Integration"],
+            "highlights": ["Multi-tenant", "Subscription billing", "Cloud-native"]
+          },
+          {
+            "name": "IT Consulting",
+            "url": "/services/it-consulting",
+            "description": "Infrastructure planning, seamless system integration, and strategic IT advisory.",
+            "subServices": ["IT Assessments", "IT Strategy & Planning", "Digital Transformation Consulting", "Security Risk Assessments", "Cloud & Data Migration", "Custom App Development"],
+            "highlights": ["IT strategy", "System integration", "Infrastructure planning"]
+          }
+        ]
+      },
+      {
+        "id": "digital-automation",
+        "name": "Digital Automation",
+        "description": "Accelerate revenue with growth-focused marketing, cloud-native infrastructure, and product-led engineering.",
+        "services": [
+          {
+            "name": "Product Engineering",
+            "url": "/services/product-engineering",
+            "description": "Full-spectrum product creation from ideation to market launch.",
+            "subServices": ["Digital Product Consultation", "Software Product Architecting", "Product Experience Design", "Product Prototyping", "Digital Product Development", "Quality Engineering"],
+            "highlights": ["Idea to launch", "Product strategy", "Scalable architecture"]
+          },
+          {
+            "name": "E-Commerce Development",
+            "url": "/services/ecommerce-development",
+            "description": "High-converting storefronts with secure checkout flows and real-time inventory sync.",
+            "subServices": ["eCommerce Online Platform", "eCommerce Mobile App", "Multi-Vendor Marketplace", "Payment & Checkout", "Headless Commerce", "Enterprise eCommerce"],
+            "highlights": ["Shopify & Magento", "Payment integration", "Headless commerce"]
+          },
+          {
+            "name": "WordPress Development",
+            "url": "/services/wordpress-development",
+            "description": "Bespoke WordPress themes, performance-optimized plugins, and WooCommerce setups.",
+            "subServices": ["CMS Development", "Custom WordPress Development", "WordPress eCommerce", "WordPress Plugin Development", "Responsive Theme Development", "WordPress Migration & Maintenance"],
+            "highlights": ["Custom themes", "WooCommerce", "Headless WordPress"]
+          },
+          {
+            "name": "Digital Marketing",
+            "url": "/services/digital-marketing",
+            "description": "Data-driven, full-funnel campaigns engineered to maximize every click.",
+            "subServices": ["Search Engine Optimization", "PPC Advertising", "Social Media Marketing", "Email Marketing", "Content Marketing", "App Store Optimization"],
+            "highlights": ["SEO & PPC", "Social media & email", "Content & ASO"]
+          },
+          {
+            "name": "Cloud Services",
+            "url": "/services/cloud-services",
+            "description": "Architecture, migration, and managed services across AWS, Azure & GCP.",
+            "subServices": ["Cloud Implementation Strategy", "Cloud Application Services", "Cloud Management Services", "DevOps As A Service", "Cloud Migration Services", "Cloud Infrastructure"],
+            "highlights": ["Cloud migration", "DevOps as a service", "Infrastructure & IaC"]
+          },
+          {
+            "name": "DevOps & Cloud Automation",
+            "url": "/services/devops-cloud-automation",
+            "description": "Automated CI/CD, Docker & Kubernetes orchestration, and Terraform-driven IaC.",
+            "subServices": ["CI/CD Pipeline Engineering", "Containerization & Orchestration", "Infrastructure as Code", "Monitoring & Observability", "DevSecOps", "Cloud Automation & Auto-Scaling"],
+            "highlights": ["CI/CD pipelines", "Kubernetes & Docker", "Infrastructure as Code"]
+          }
+        ]
+      }
+    ]
+  },
+
+  "industries": [
+    {
+      "name": "Healthcare & Lifesciences",
+      "url": "/industry/healthcare-lifesciences",
+      "tagline": "Building Healthier Futures with Technology",
+      "description": "HIPAA-compliant digital health solutions covering telemedicine, EHR, patient portals, clinical data management, and medical device integration.",
+      "keyCapabilities": ["Telemedicine & virtual care platforms", "EHR & EMR system integration", "HIPAA & HITRUST compliance", "Medical device IoT connectivity", "Clinical trial data management", "Patient engagement portals"],
+      "services": ["Patient Portals", "Telemedicine", "EHR Systems", "Health Analytics"]
+    },
+    {
+      "name": "E-Commerce Solutions",
+      "url": "/industry/ecommerce-solutions",
+      "tagline": "Powering the Future of Online Commerce",
+      "description": "End-to-end e-commerce solutions with AI-driven personalization, multi-vendor marketplace capabilities, and seamless payment gateway integration.",
+      "keyCapabilities": ["AI-powered product recommendations", "Multi-vendor marketplace platforms", "Headless commerce architecture", "Seamless payment integration", "Real-time inventory management", "Conversion rate optimization"],
+      "services": ["Online Stores", "Marketplaces", "Payment Gateways", "Inventory Systems"]
+    },
+    {
+      "name": "Transport & Logistics",
+      "url": "/industry/transport-logistics",
+      "tagline": "Streamlining Supply Chains Digitally",
+      "description": "Complete solutions for transport & logistics from on-demand delivery and warehouse management to taxi booking and courier delivery with GPS tracking and route optimization.",
+      "keyCapabilities": ["Real-time fleet GPS tracking", "AI-powered route optimization", "Warehouse management systems", "Automated dispatch & scheduling", "Supply chain visibility dashboards", "Last-mile delivery solutions"],
+      "services": ["Fleet Management", "Route Planning", "Warehouse Systems", "Delivery Apps"]
+    },
+    {
+      "name": "Social Networking",
+      "url": "/industry/social-networking",
+      "tagline": "Connecting People at Scale",
+      "description": "Custom social networking platform development with real-time messaging, content feeds, community management, and user-generated content at scale.",
+      "keyCapabilities": ["Real-time chat & messaging", "Content feeds & algorithms", "Community management tools", "User-generated content moderation", "Social analytics & insights", "Dating & matching platforms"],
+      "services": ["Social Platforms", "Messaging Apps", "Dating Apps", "Community Portals"]
+    },
+    {
+      "name": "Real Estate",
+      "url": "/industry/real-estate",
+      "tagline": "Digitizing Property Experiences",
+      "description": "Personalized property buying & selling experiences with virtual tours, CRM integration, automated lead management, and property analytics dashboards.",
+      "keyCapabilities": ["Property listing platforms", "3D virtual tours & walkthroughs", "CRM & lead management", "Mortgage calculator integration", "Property valuation analytics", "Tenant management portals"],
+      "services": ["Listing Portals", "Virtual Tours", "Property CRM", "Management Apps"]
+    },
+    {
+      "name": "Education & eLearning",
+      "url": "/industry/education-elearning",
+      "tagline": "Transforming Learning Experiences",
+      "description": "Interactive educational apps and software with adaptive learning paths, live virtual classrooms, gamification-based engagement, and comprehensive progress analytics.",
+      "keyCapabilities": ["Learning management systems", "Live virtual classrooms", "Adaptive learning algorithms", "Gamification & engagement", "Progress analytics dashboards", "Content authoring tools"],
+      "services": ["LMS Platforms", "Virtual Classes", "EdTech Apps", "Assessment Tools"]
+    },
+    {
+      "name": "Banking, Finance & Insurance",
+      "url": "/industry/banking-finance-insurance",
+      "tagline": "Securing Financial Operations Digitally",
+      "description": "World-class digital banking, finance and insurance services with AI-powered fraud detection, automated claims processing, PCI-DSS compliant payment systems.",
+      "keyCapabilities": ["Digital banking platforms", "AI-powered fraud detection", "Automated claims processing", "PCI-DSS compliance", "Loan management systems", "Insurance underwriting engines"],
+      "services": ["Digital Banking", "Insurance Tech", "Loan Systems", "Compliance Tools"]
+    },
+    {
+      "name": "Travel & Hospitality",
+      "url": "/industry/travel-hospitality",
+      "tagline": "Redefining Travel with Smart Solutions",
+      "description": "Booking engines, travel management platforms, and hospitality solutions with dynamic pricing, multi-channel distribution, and personalized travel recommendations.",
+      "keyCapabilities": ["Online booking engines", "Dynamic pricing algorithms", "Hotel management systems", "Multi-channel distribution", "AI-powered recommendations", "Loyalty & rewards programs"],
+      "services": ["Booking Platforms", "Hotel Systems", "Travel Apps", "Loyalty Programs"]
+    },
+    {
+      "name": "Enterprise Retail & Manufacturing",
+      "url": "/industry/enterprise-retail-manufacturing",
+      "tagline": "Smart Solutions for Modern Industry",
+      "description": "Custom enterprise, retail & manufacturing solutions with IoT-powered smart factory systems, supply chain optimization, and ERP integration.",
+      "keyCapabilities": ["IoT-powered smart factories", "Supply chain management", "Inventory optimization", "ERP system integration", "Quality control automation", "Predictive maintenance"],
+      "services": ["ERP Systems", "IoT Solutions", "Supply Chain", "Retail Platforms"]
+    },
+    {
+      "name": "Oil & Gas",
+      "url": "/industry/oil-gas",
+      "tagline": "Digital Innovation for Energy Sector",
+      "description": "Advanced IT solutions for Oil & Gas including digital asset monitoring, predictive maintenance systems, SCADA integration, and safety compliance platforms.",
+      "keyCapabilities": ["Digital asset monitoring", "Predictive maintenance systems", "SCADA integration", "Safety compliance platforms", "Reservoir management tools", "Environmental monitoring"],
+      "services": ["Asset Management", "Maintenance Systems", "Safety Platforms", "SCADA"]
+    },
+    {
+      "name": "Media & Entertainment",
+      "url": "/industry/media-entertainment",
+      "tagline": "Creating Engaging Digital Experiences",
+      "description": "Streaming platforms, content management systems, and digital media distribution with DRM protection, analytics, and global content delivery.",
+      "keyCapabilities": ["Video streaming platforms", "Content management systems", "DRM & rights management", "Live event & ticketing", "Media analytics dashboards", "CDN & global distribution"],
+      "services": ["Streaming Platforms", "CMS Solutions", "Event Ticketing", "Media Analytics"]
+    },
+    {
+      "name": "On Demand Delivery",
+      "url": "/industry/on-demand-delivery",
+      "tagline": "Instant Delivery, Seamless Experience",
+      "description": "On-demand delivery platforms powered by AI for demand prediction, IoT for real-time tracking, and chatbots for customer support.",
+      "keyCapabilities": ["Food & grocery delivery apps", "Real-time order tracking", "AI-powered demand prediction", "Dynamic dispatch & routing", "Multi-vendor management", "In-app payment & wallet"],
+      "services": ["Food Delivery", "Grocery Apps", "Courier Services", "Delivery Logistics"]
+    },
+    {
+      "name": "Home Service",
+      "url": "/industry/home-service",
+      "tagline": "On-Demand Services at Your Doorstep",
+      "description": "On-demand home service platforms connecting service providers with customers via intelligent booking engines, provider matching algorithms, and scheduling systems.",
+      "keyCapabilities": ["Service booking platforms", "Provider matching algorithms", "Real-time scheduling", "In-app secure payments", "Rating & review systems", "Service tracking dashboards"],
+      "services": ["Booking Apps", "Provider Platforms", "Scheduling Tools", "Payment Systems"]
+    },
+    {
+      "name": "Fintech",
+      "url": "/industry/fintech",
+      "tagline": "Next-Gen Financial Technology",
+      "description": "Scalable financial technology solutions including digital wallets, payment gateways, lending platforms, robo-advisory investment tools, and wealth management systems.",
+      "keyCapabilities": ["Digital wallet platforms", "Payment gateway solutions", "Lending & credit platforms", "Robo-advisory systems", "Blockchain & crypto solutions", "Regulatory compliance engines"],
+      "services": ["Digital Wallets", "Payment Systems", "Lending Platforms", "Investment Tools"]
+    },
+    {
+      "name": "mCommerce",
+      "url": "/industry/mcommerce",
+      "tagline": "Mobile-First Shopping Experiences",
+      "description": "Mobile commerce platforms optimized for maximum conversions with one-tap checkout flows, personalized push notifications, and loyalty programs.",
+      "keyCapabilities": ["Mobile-first store design", "One-tap checkout flows", "Push notification campaigns", "Loyalty & rewards programs", "AR product visualization", "Cross-platform performance"],
+      "services": ["Mobile Stores", "Checkout Systems", "Loyalty Apps", "AR Commerce"]
+    }
+  ],
+
+  "techStack": {
+    "frontend": ["React", "Next.js", "TypeScript", "JavaScript", "Angular", "Vue.js", "Tailwind CSS", "HTML5", "CSS3"],
+    "backend": ["Node.js", "Python", "Java", "Spring Boot", "Go", "PHP", "Django", ".NET Core", "GraphQL", "REST APIs"],
+    "mobile": ["React Native", "Flutter", "Swift (iOS)", "Kotlin (Android)", "Java (Android)", "Dart", "Progressive Web Apps"],
+    "cloudDevOps": ["AWS", "Microsoft Azure", "Google Cloud (GCP)", "Docker", "Kubernetes", "Terraform", "CI/CD", "Jenkins", "GitHub Actions"],
+    "databases": ["PostgreSQL", "MongoDB", "MySQL", "Redis", "Firebase", "Elasticsearch", "Neo4j", "DynamoDB"],
+    "aiMl": ["TensorFlow", "PyTorch", "scikit-learn", "OpenAI", "LangChain", "Apache Spark", "Kafka", "Pandas", "NumPy", "Jupyter"],
+    "design": ["Figma", "Adobe XD", "Photoshop", "Illustrator", "After Effects", "Sketch"],
+    "ecommerce": ["Shopify", "WooCommerce", "Magento", "Stripe", "PayPal"],
+    "cms": ["WordPress", "Contentful", "Strapi", "Sanity"],
+    "testing": ["Jest", "Selenium", "Cucumber", "Cypress", "Playwright"]
+  },
+
+  "pricing": {
+    "overview": "Our pricing is customized based on your specific requirements. We offer three flexible engagement models.",
+    "models": [
+      {
+        "name": "Fixed Price Model",
+        "description": "Best for short-term projects with clear, well-documented requirements. You know the exact cost upfront with no surprises.",
+        "idealFor": ["MVPs", "Landing pages", "Well-scoped features"],
+        "features": ["Defined scope & budget", "Milestone-based payments", "Ideal for MVPs"]
+      },
+      {
+        "name": "Time & Material Model",
+        "description": "Cost-effective for long-term projects with evolving requirements. Flexible resource allocation and adapting to market needs.",
+        "idealFor": ["Long-term projects", "Evolving requirements", "Agile development"],
+        "features": ["Flexible scope", "Pay for actual hours", "Best for evolving projects"]
+      },
+      {
+        "name": "Dedicated Development Team",
+        "description": "Preferred when projects require committed tech staff working exclusively on your product. Full team as an extension of your organization.",
+        "idealFor": ["Ongoing product development", "Staff augmentation", "Enterprise projects"],
+        "features": ["Full-time dedicated team", "Direct communication", "Monthly engagement"]
+      }
+    ],
+    "budgetRanges": [
+      "Less than $5,000",
+      "$5,000 - $15,000",
+      "$15,000 - $50,000",
+      "$50,000 - $100,000",
+      "$100,000+"
+    ],
+    "note": "Book a free 30-minute consultation to get a personalized estimate for your project."
+  },
+
+  "projectTimelines": {
+    "overview": "Project timelines vary based on complexity and requirements.",
+    "estimates": {
+      "simpleApp": "4-8 weeks",
+      "webApplication": "2-4 months",
+      "mobileApp": "3-6 months",
+      "enterpriseSolution": "6-12 months",
+      "mvp": "4-8 weeks"
+    },
+    "methodology": "Agile with 2-week sprints",
+    "includes": ["Regular updates", "Milestone-based delivery", "Flexible scope adjustments"]
+  },
+
+  "processMethodology": {
+    "name": "6-Phase Agile Development Process",
+    "description": "A battle-tested six-phase process balancing speed, quality, and full visibility.",
+    "phases": [
+      {
+        "number": "01",
+        "title": "Discovery & Requirements",
+        "description": "Business development engages business analysts for requirement analysis. BA prepares feature specification document with client approval.",
+        "deliverables": ["Feature specification document", "Project scope confirmation"]
+      },
+      {
+        "number": "02",
+        "title": "Consolidation & Planning",
+        "description": "Requirements consolidation, user stories, user flows, information architecture, and wireframes.",
+        "deliverables": ["User stories", "User flows", "Information architecture", "Wireframes"]
+      },
+      {
+        "number": "03",
+        "title": "UI/UX Design",
+        "description": "High-fidelity mockups, interactive prototypes for user testing, and final design assets.",
+        "deliverables": ["High-fidelity mockups", "Interactive prototypes", "Style guide"]
+      },
+      {
+        "number": "04",
+        "title": "Development Sprints",
+        "description": "Short agile sprints — maximum 2 weeks each. Design, develop, deploy, and QA for each sprint.",
+        "deliverables": ["Sprint demos", "Working features", "Sprint reports"]
+      },
+      {
+        "number": "05",
+        "title": "Testing & QA",
+        "description": "Comprehensive testing — unit, integration, performance, and security. Cross-browser and cross-device testing.",
+        "deliverables": ["Test reports", "Bug fixes", "UAT sign-off"]
+      },
+      {
+        "number": "06",
+        "title": "Launch & Support",
+        "description": "CI/CD pipelines for smooth production deployment. Post-launch monitoring, optimization, and 24/7 support.",
+        "deliverables": ["Production deployment", "Documentation", "Handover", "Support SLA"]
+      }
+    ],
+    "security": [
+      "Mutual NDA signed before every engagement",
+      "Password-protected systems and encrypted repositories",
+      "Employee confidentiality agreements",
+      "24/7 CCTV monitored development centers"
+    ],
+    "compliance": ["HIPAA", "SOC 2", "GDPR", "PCI-DSS Level 1"]
+  },
+
+  "portfolio": {
+    "overview": "50+ successful projects delivered across 15+ industries. Visit /our-work to explore all case studies.",
+    "url": "/our-work",
+    "totalProjects": "200+",
+    "caseStudies": [
+      {
+        "id": "chorus-health",
+        "company": "CHORUS",
+        "client": "Google",
+        "industry": "Healthcare",
+        "type": "Cross-Platform App",
+        "headline": "Cross-platform healthcare app for Google with real-time patient vitals monitoring.",
+        "technologies": ["BLE", "Web", "Android", "iOS"],
+        "metrics": {"uptime": "99.9%", "platforms": 3, "securityBreaches": 0},
+        "duration": "120 days"
+      },
+      {
+        "id": "cartflow-ecom",
+        "company": "CartFlow",
+        "industry": "E-Commerce",
+        "type": "Headless Commerce",
+        "headline": "AI-powered headless commerce platform driving 38% increase in average order value.",
+        "technologies": ["TensorFlow", "Spring Boot", "Redis", "Kafka"],
+        "metrics": {"aovIncrease": "38%", "abandonmentDrop": "22%", "inferenceLatency": "18ms"},
+        "duration": "60 days"
+      },
+      {
+        "id": "fleettrack-logistics",
+        "company": "FleetTrack",
+        "industry": "Transport & Logistics",
+        "type": "Fleet Management",
+        "headline": "IoT-powered fleet management system reducing fuel costs by 25% across 2000+ vehicles.",
+        "technologies": ["GPS", "IoT", "AI", "Machine Learning"],
+        "metrics": {"fuelCostReduction": "25%", "vehiclesTracked": "2000+", "fewerBreakdowns": "40%"},
+        "duration": "90 days"
+      },
+      {
+        "id": "finsmart",
+        "company": "FinSmart",
+        "industry": "Banking & Finance",
+        "type": "AI-Powered Finance App",
+        "headline": "AI-powered financial management app with fraud detection and smart budgeting.",
+        "technologies": ["ML", "Biometric Auth", "Digital Wallet"],
+        "metrics": {"fraudDetection": "95%", "dataEncryption": "100%"},
+        "duration": "80 days"
+      },
+      {
+        "id": "paybridge",
+        "company": "PayBridge",
+        "industry": "Fintech",
+        "type": "Payment Gateway",
+        "headline": "Unified payment gateway processing $500M+ annually with 99.99% uptime.",
+        "technologies": ["PCI-DSS L1", "Multi-acquirer routing", "Smart retry"],
+        "metrics": {"annualVolume": "$500M+", "uptime": "99.99%", "avgLatency": "150ms"},
+        "duration": "100 days"
+      },
+      {
+        "id": "factoryiq",
+        "company": "FactoryIQ",
+        "industry": "Manufacturing",
+        "type": "Smart Factory",
+        "headline": "IoT-powered smart factory platform reducing downtime by 45% across 12 production lines.",
+        "technologies": ["IoT", "ML", "Edge Computing", "Time-series DB"],
+        "metrics": {"downtimeReduced": "45%", "iotSensors": "1000+", "oeeImprovement": "30%"},
+        "duration": "100 days"
+      },
+      {
+        "id": "bookwise",
+        "company": "BookWise",
+        "industry": "Travel & Hospitality",
+        "type": "Booking Platform",
+        "headline": "AI-powered travel booking platform with dynamic pricing serving 1M+ bookings annually.",
+        "technologies": ["ML", "Multi-CDN", "Auto-scaling"],
+        "metrics": {"annualBookings": "1M+", "supplierIntegrations": "200+", "revenueUplift": "15%"},
+        "duration": "90 days"
+      },
+      {
+        "id": "learnai",
+        "company": "LearnAI",
+        "industry": "Education & eLearning",
+        "type": "AI-Driven Platform",
+        "headline": "AI-driven e-learning platform with personalized learning paths and live classes.",
+        "technologies": ["AI", "WebRTC", "Gamification"],
+        "metrics": {"learnerImprovement": "45%", "engagementIncrease": "3x", "activeStudents": "10K+"},
+        "duration": "90 days"
+      }
+    ]
+  },
+
+  "clients": {
+    "overview": "Trusted by startups and Fortune 500s across 15+ industries worldwide.",
+    "notableClients": [
+      "Deutsche Bank", "Bank of America", "NEC", "TD Bank", "CVS Health",
+      "Black Knight", "Maniyar INC", "ITEInfotech", "Y&L Consulting",
+      "Bhashini", "Rekkoz", "Karmyogi Bharat", "VSN"
+    ],
+    "clientTypes": ["Early-stage startups", "YC-backed ventures", "Tiger Global-backed companies", "Accel-backed companies", "Fortune 500 enterprises"],
+    "testimonials": [
+      {
+        "name": "Dr. Meera Kapoor",
+        "title": "CTO at MedAssist Health",
+        "review": "CloudNexus delivered a complete healthcare platform in record time. Their team understood HIPAA compliance from day one and built a system that our doctors and patients love."
+      },
+      {
+        "name": "Rahul Mehta",
+        "title": "Founder & CEO at ShopSwift",
+        "review": "We needed a scalable e-commerce backend handling 50K+ concurrent users during flash sales. CloudNexus architected and deployed it on AWS with zero downtime. Truly exceptional engineering."
+      },
+      {
+        "name": "Ananya Sharma",
+        "title": "VP of Engineering at FinEdge",
+        "review": "Their dedicated development team integrated seamlessly with ours. Code quality, communication, and delivery speed exceeded every expectation. CloudNexus feels like an extension of our own team."
+      },
+      {
+        "name": "James Mitchell",
+        "title": "CTO at NovaTrade Group, London",
+        "review": "From AI-powered analytics to a real-time logistics dashboard, CloudNexus turned our vision into a production-ready product in just 4 months. Their technical depth is unmatched."
+      },
+      {
+        "name": "Priya Nair",
+        "title": "Director of IT at BuildCorp Industries",
+        "review": "CloudNexus rebuilt our legacy ERP system into a modern cloud-native platform. The migration was smooth, the new system is 3x faster, and our team's productivity has skyrocketed."
+      },
+      {
+        "name": "Sarah Chen",
+        "title": "Head of Digital at Apex Financial, Singapore",
+        "review": "We evaluated five vendors before choosing CloudNexus for our mobile banking app. Their fintech expertise, security-first approach, and on-time delivery made them the clear winner."
+      }
+    ]
+  },
+
+  "careers": {
+    "overview": "Join a team of passionate engineers, designers, and innovators building cutting-edge technology solutions for global clients.",
+    "careersUrl": "/resources/career",
+    "stats": {
+      "teamMembers": "50+",
+      "projectsDelivered": "100+",
+      "glassdoorRating": "4.8"
+    },
+    "hrEmail": "hr@cloudnexus.in",
+    "workSchedule": "5 days a week",
+    "openPositionsUrl": "/resources/career",
+    "benefitsUrl": "/company/career-benefits",
+    "applicationProcess": "Visit /resources/career to see all open positions and apply online. You can also email hr@cloudnexus.in to drop your resume.",
+    "cultureHighlights": [
+      "Innovation-first culture",
+      "Collaborative & inclusive environment",
+      "Merit-based recognition",
+      "Clear career paths & mentorship programs",
+      "5-day work week",
+      "People-first policies"
+    ]
+  },
+
+  "benefits": {
+    "overview": "12+ unique perks ensuring financial security, workplace convenience, and employee well-being.",
+    "financial": [
+      "Competitive salary with regular appraisals and performance bonuses",
+      "Zero minimum balance salary account",
+      "Free passbook, cheque book, and debit card",
+      "Accidental Death Cover up to ₹50 Lakhs",
+      "Permanent Disability Cover up to ₹50 Lakhs",
+      "Air Accident Cover up to ₹2 Crores",
+      "Child Education Cover up to ₹10 Lakhs",
+      "Salary Advance: Up to 1 month salary",
+      "Instant Personal Loan: Up to ₹5 Lakhs"
+    ],
+    "welfare": [
+      "Complimentary meals: Breakfast, Lunch, Dinner, and Tea/Chai",
+      "Monthly team outings (up to 2 times a month)",
+      "PS5 Chill Room with gaming console, chess, UNO, bunk beds",
+      "Collaborative and friendly work environment",
+      "Open-door policy with leadership"
+    ],
+    "growth": [
+      "Annual learning budget for courses, certifications, and conferences",
+      "Sponsored certifications and career development",
+      "Internal tech talks and knowledge sharing",
+      "Clear career progression paths"
+    ],
+    "workLife": [
+      "5-day work week",
+      "Remote flexibility options",
+      "Generous paid time off (vacation, sick days, personal time)",
+      "Birthday celebrations",
+      "Cultural programs and festivals",
+      "Business trips to global conferences"
+    ]
+  },
+
+  "faqs": [
+    {
+      "question": "What services does CloudNexus provide?",
+      "answer": "CloudNexus provides 20+ services across 3 categories: Intelligent Automation (AI/ML, Digital Transformation, Cybersecurity, Technology Consulting), Software Engineering (Mobile Apps, Web Development, Software Development, MVP, Hire Developers, UI/UX, SaaS, IT Consulting), and Digital Automation (Product Engineering, E-Commerce, WordPress, Digital Marketing, Cloud Services, DevOps)."
+    },
+    {
+      "question": "How long does a typical project take?",
+      "answer": "Timelines vary: simple apps take 4-8 weeks, web applications take 2-4 months, mobile apps take 3-6 months, and enterprise solutions take 6-12 months. We provide detailed timelines during the free consultation."
+    },
+    {
+      "question": "Do you work with startups or only enterprises?",
+      "answer": "We work with both — from early-stage startups to Fortune 500 companies. We have partnered with YC, Tiger Global, and Accel-backed ventures as well as large enterprises."
+    },
+    {
+      "question": "What industries do you specialize in?",
+      "answer": "We serve 15+ industries: Healthcare, E-Commerce, Fintech, Education, Real Estate, Logistics, Media, Manufacturing, Banking & Finance, Travel, Oil & Gas, Social Networking, On-Demand Delivery, Home Service, and mCommerce."
+    },
+    {
+      "question": "How do you ensure quality, security, and reliability?",
+      "answer": "Through Agile methodology, CI/CD pipelines, code reviews, automated testing, performance checks, security audits, and continuous validation. We are compliant with HIPAA, SOC 2, and GDPR."
+    },
+    {
+      "question": "What is your pricing model?",
+      "answer": "We offer three flexible models: Fixed-price (best for defined scope), Time & Material (best for evolving requirements), and Dedicated Teams (best for ongoing development). Contact us for a personalized estimate."
+    },
+    {
+      "question": "Do you provide post-launch support?",
+      "answer": "Yes — we provide bug fixes, monitoring, security updates, feature enhancements, and 24/7 support based on your SLA. We stay engaged post-launch."
+    },
+    {
+      "question": "What tech stack does CloudNexus use?",
+      "answer": "React, Next.js, Node.js, Python, Flutter, React Native, AWS, Azure, GCP, Docker, Kubernetes, PostgreSQL, MongoDB, and more. We pick the best tools for each specific project."
+    },
+    {
+      "question": "Can CloudNexus help migrate my application to the cloud?",
+      "answer": "Absolutely. We handle end-to-end cloud migration — infrastructure assessment, architecture redesign, data migration, and post-migration optimization on AWS, Azure, or GCP."
+    },
+    {
+      "question": "Do you offer AI and Machine Learning solutions?",
+      "answer": "Yes — from computer vision and NLP to predictive analytics, recommendation engines, and custom AI model training. We build production-ready AI solutions tailored to your business."
+    },
+    {
+      "question": "How can I get a free consultation?",
+      "answer": "Visit cloudnexus.in/resources/free-consultation or click 'Join Now' in the navigation. Book a free 30-minute strategy session — no commitment, no cost. Our experts will assess your needs and recommend the best path forward."
+    },
+    {
+      "question": "What is your development process?",
+      "answer": "Discovery & consultation → Requirement analysis → UI/UX design → Agile development (2-week sprints) → QA & testing → Deployment → Post-launch support. Every step is transparent with regular check-ins."
+    },
+    {
+      "question": "Do you build mobile apps for both iOS and Android?",
+      "answer": "Yes — we build native apps (Swift for iOS, Kotlin for Android) and cross-platform apps (Flutter, React Native). We help you choose the right approach based on your budget, timeline, and user needs."
+    },
+    {
+      "question": "Where is CloudNexus located?",
+      "answer": "CloudNexus is headquartered in Bhopal, India, with development centers in Hyderabad and Bengaluru. We serve clients globally and work across different time zones."
+    },
+    {
+      "question": "How do you communicate during a project?",
+      "answer": "Through daily standups, sprint reports, and transparent communication channels — ensuring full visibility and regular client updates at every stage. We use tools like Jira, Slack, and Confluence."
+    }
+  ],
+
+  "navigation": {
+    "mainLinks": [
+      {"label": "Services", "url": "/services"},
+      {"label": "Industry", "url": "/industry"},
+      {"label": "Our Work", "url": "/our-work"},
+      {"label": "Resources", "url": "/resources"},
+      {"label": "Company", "url": "/company"},
+      {"label": "Free Consultation", "url": "/resources/free-consultation"}
+    ],
+    "quickLinks": {
+      "getStarted": "/resources/free-consultation",
+      "contact": "/resources/contact",
+      "careers": "/resources/career",
+      "blog": "/resources/blog",
+      "support": "/resources/support",
+      "aboutUs": "/company/about-us",
+      "team": "/company/team",
+      "portfolio": "/our-work",
+      "benefits": "/company/career-benefits"
+    }
+  },
+
+  "whyChooseUs": [
+    {
+      "title": "Proven Project Delivery",
+      "description": "From CHORUS (healthcare platform for Google) to CartFlow's AI-powered e-commerce engine — we ship production-grade products on schedule.",
+      "stat": "200+",
+      "statLabel": "Projects Delivered"
+    },
+    {
+      "title": "Cross-Industry Expertise",
+      "description": "Trusted by startups and enterprises across Healthcare, Fintech, Logistics, E-Commerce, and 15+ industries with domain-specific solutions.",
+      "stat": "15+",
+      "statLabel": "Industries Served"
+    },
+    {
+      "title": "AI & ML Engineering",
+      "description": "AI-driven solutions powering fraud detection at FinSmart, route optimization at FleetTrack, and personalized learning at LearnAI.",
+      "stat": "98%",
+      "statLabel": "Client Satisfaction"
+    },
+    {
+      "title": "Global Delivery",
+      "description": "Seamless delivery across time zones with dedicated engineering teams based in Hyderabad, Bhopal, and Bengaluru.",
+      "stat": "3",
+      "statLabel": "Office Locations"
+    },
+    {
+      "title": "Result-Driven Approach",
+      "description": "Every engagement is backed by measurable KPIs — 45% downtime reduction at FactoryIQ, 38% AOV increase at CartFlow, 99.99% uptime at PayBridge.",
+      "stat": "100%",
+      "statLabel": "Transparency"
+    },
+    {
+      "title": "Scalable Teams",
+      "description": "Rapidly scale from a single developer to a full 50+ member engineering pod within weeks across DevOps, Development, and Data squads.",
+      "stat": "90+",
+      "statLabel": "Engineers On-Demand"
+    }
+  ],
+
+  "growthTimeline": [
+    {
+      "date": "19 Jan 2025",
+      "title": "The Seed Was Planted",
+      "description": "Cloud Nexus was founded with a clear mission — to bridge the gap between business needs and technology. A small team with big dreams laid the foundation."
+    },
+    {
+      "date": "Mid 2025",
+      "title": "Taking Root & Growing",
+      "description": "Expanded the team, onboarded first global clients, and delivered 30+ successful projects. Expertise in mobile, web, cloud, and AI started gaining recognition."
+    },
+    {
+      "date": "Early 2026",
+      "title": "Branching Out",
+      "description": "50+ projects delivered across 15+ industries. Attended global tech conferences like GITEX, built dedicated AI/ML capabilities, and expanded the service portfolio."
+    },
+    {
+      "date": "Today & Beyond",
+      "title": "Reaching New Heights",
+      "description": "A full-service technology company trusted by businesses worldwide. Plans to scale further, innovate boldly, and create lasting impact."
+    }
+  ],
+
+  "chatbotPersonality": {
+    "name": "CloudNexus Assistant",
+    "tone": "Professional yet friendly, knowledgeable, helpful",
+    "language": "English",
+    "primaryGoal": "Help visitors understand CloudNexus services and guide them to the right solution",
+    "escalationEmail": "work@cloudnexus.in",
+    "escalationPhone": "+91 87938 30447",
+    "consultationUrl": "/resources/free-consultation",
+    "keyMessages": [
+      "CloudNexus is a leading software development company based in Bhopal, India",
+      "Founded in January 2025 with 90+ in-house engineers",
+      "Delivered 200+ projects across 15+ industries",
+      "Free 30-minute consultation available for any project inquiry",
+      "Offices in Bhopal (HQ), Hyderabad, and Bengaluru"
+    ],
+    "quickReplySuggestions": {
+      "greeting": ["Our Services", "Get a Quote", "Careers", "About CloudNexus"],
+      "services": ["Mobile Apps", "Web Development", "AI/ML", "Cloud Services"],
+      "pricing": ["Get a Quote", "Book Free Consultation", "View Our Work"],
+      "careers": ["View Open Positions", "Career Benefits", "Contact HR"],
+      "contact": ["Book Free Call", "Email Us", "Our Offices"]
+    }
+  }
+}

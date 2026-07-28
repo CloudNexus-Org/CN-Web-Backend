@@ -35,6 +35,13 @@ jobs:
       - name: TypeScript compile
         run: npm run build
 
+      - name: Run tests
+        run: npm test
+        env:
+          DATABASE_URL: postgresql://ci:ci@127.0.0.1:5432/ci?schema=public
+          JWT_SECRET: ci-test-jwt-secret-min-32-characters-long
+          NODE_ENV: test
+
   docker:
     runs-on: ubuntu-latest
     needs: compile
