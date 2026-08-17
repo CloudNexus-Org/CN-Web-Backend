@@ -1,129 +1,229 @@
-# Cloud Nexus — Backend API
+# ⚙️ Cloud Nexus — Backend API Documentation (`CN-Web-Backend`)
 
-Standalone Node.js + Express REST API with PostgreSQL (Prisma), JWT auth, admin 2FA, file uploads, and public routes for the marketing site. You can hand off **only this folder**; everything below is backend-specific.
+Standalone Node.js + Express REST API built with TypeScript, PostgreSQL (via Prisma ORM), JWT authentication, Admin 2FA (email OTP), file upload engine, and public API endpoints.
 
-## Requirements
+---
 
-- **Node.js** 20+
-- **PostgreSQL** 14+ (local install, Docker, or managed host)
-- **npm**
+## 📋 Table of Contents
 
-## Quick start
+- [Features](#-features)
+- [Prerequisites](#-prerequisites)
+- [Environment Configuration (`.env`)](#-environment-configuration-env)
+- [Step-by-Step Execution Guide](#-step-by-step-execution-guide)
+  - [1. Database Setup](#1-database-setup)
+  - [2. Install Dependencies](#2-install-dependencies)
+  - [3. Database Migration & Prisma Client](#3-database-migration--prisma-client)
+  - [4. Seed Admin Account](#4-seed-admin-account)
+  - [5. Run Development Server](#5-run-development-server)
+  - [6. Run Production Server](#6-run-production-server)
+- [Database Management (Prisma Studio)](#-database-management-prisma-studio)
+- [Available NPM Scripts](#-available-npm-scripts)
+- [API Routes Reference](#-api-routes-reference)
+- [Folder Structure](#-folder-structure)
+
+---
+
+## ✨ Features
+
+- **Authentication**: JWT-based security for standard users and verified administrators.
+- **Admin 2FA Verification**: Multi-factor authentication via 6-digit email OTPs using Nodemailer (SMTP).
+- **ORM & Database**: PostgreSQL database managed via Prisma ORM.
+- **File Uploads**: Handles candidate resume uploads (`/applications`) and blog image uploads (`/admin/uploads/blog-image`).
+- **Public & Admin APIs**: Complete separation of public marketing endpoints and protected admin dashboard routes.
+
+---
+
+## 📌 Prerequisites
+
+Before running the backend, ensure you have installed:
+- **Node.js**: v20.0.0 or higher
+- **npm**: v9.0.0 or higher
+- **PostgreSQL**: v14+ (Local installation or Docker container)
+
+---
+
+## 🔑 Environment Configuration (`.env`)
+
+In the `CN-Web-Backend` directory, copy `.env.example` to `.env` or create `.env`:
 
 ```bash
-cd backend
-npm install
 cp .env.example .env
-# Edit .env: DATABASE_URL, JWT_SECRET (required). Add SMTP_* for admin 2FA email.
-npx prisma generate
-npx prisma db push
+```
+
+Configure the environment variables inside `.env`:
+
+```env
+# PostgreSQL Database Connection String
+DATABASE_URL="postgresql://cn:cn_dev_password@localhost:5433/cloudnexus?schema=public"
+
+# Secret Key for JWT Token Generation (Use a long 32+ character random string)
+JWT_SECRET="replace_with_a_long_random_string_min_32_chars"
+
+# Port on which Backend server listens
+PORT=4000
+
+# Allowed CORS Origins (Frontend URL)
+CORS_ORIGIN=http://localhost:3000
+
+# Admin 2FA Email SMTP Credentials (e.g., Gmail App Password)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_SECURE=true
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_gmail_app_password
+SMTP_FROM="Cloud Nexus <your_email@gmail.com>"
+
+# Security Flag (Keep false in production so OTP is sent strictly via email)
+ADMIN_OTP_EXPOSE_DEV_CODE=false
+
+# Optional Chatbot Microservice URL
+CHATBOT_SERVICE_URL=http://localhost:8000
+```
+
+---
+
+## 🚀 Step-by-Step Execution Guide
+
+### 1. Database Setup
+Start a PostgreSQL container on port `5433` (or use your local PostgreSQL instance):
+
+```powershell
+docker run --name cloudnexus-db -e POSTGRES_USER=cn -e POSTGRES_PASSWORD=cn_dev_password -e POSTGRES_DB=cloudnexus -p 5433:5432 -d postgres:16-alpine
+```
+
+---
+
+### 2. Install Dependencies
+Navigate into `CN-Web-Backend` and install npm packages:
+
+```powershell
+cd CN-Web-Backend
+npm install
+```
+
+---
+
+### 3. Database Migration & Prisma Client
+Generate the Prisma Client and push the schema to PostgreSQL:
+
+```powershell
+# Generate Prisma Client JS
+npm run db:generate
+
+# Push schema directly to PostgreSQL
+npm run db:push
+```
+
+*(For production schema migrations, use `npm run db:migrate` instead).*
+
+---
+
+### 4. Seed Admin Account
+To create an initial administrator account for logging into the admin panel:
+
+```powershell
+npm run admin:create
+```
+Follow the interactive CLI prompts to enter the admin name, email, and password.
+
+---
+
+### 5. Run Development Server
+Start the backend API in development mode with automatic hot-reloading (`tsx watch`):
+
+```powershell
 npm run dev
 ```
 
-- Health check: `http://localhost:4000/health` (or your `PORT`)
-- API base: `http://localhost:4000` by default
+- **API Base URL**: `http://localhost:4000`
+- **Health Check Endpoint**: `http://localhost:4000/health`
 
-## Scripts (`package.json`)
+---
 
-| Script | Purpose |
-|--------|---------|
-| `npm run dev` | Run API with `tsx watch` (hot reload) |
-| `npm run build` | Compile TypeScript → `dist/` |
-| `npm start` | Run compiled app (`node dist/index.js`) |
-| `npm run db:generate` | Regenerate Prisma Client after schema changes |
-| `npm run db:push` | Push schema to DB (dev / prototyping only) |
-| `npm run db:migrate` | Apply pending migrations (`prisma migrate deploy`) |
-| `npm run db:migrate:dev` | Create/apply migrations in development |
-| `npm run db:studio` | Open Prisma Studio GUI |
-| `npm run admin:create` | Create an admin user (see script output) |
+### 6. Run Production Server
+To compile TypeScript and start the production server:
 
-For production schema changes, prefer **`prisma migrate`** workflows instead of `db push` when you have a migration history.
+```powershell
+# Step 1: Build TypeScript to dist/
+npm run build
 
-## Environment variables
-
-Copy **`.env.example`** → **`.env`**. Never commit `.env`.
-
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `JWT_SECRET` | Yes | Secret for signing JWTs (long random string) |
-| `PORT` | No | Listen port (default `4000`) |
-| `CORS_ORIGIN` | No | Comma-separated allowed browser origins (default `http://localhost:3000`). `localhost` and `127.0.0.1` variants are paired automatically. |
-| `SMTP_*` | For admin 2FA email | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` |
-| `ADMIN_OTP_EXPOSE_DEV_CODE` | No | Dev only: if `true`, OTP may be returned in API for debugging. **Never enable in production.** |
-
-## HTTP routes (overview)
-
-Mounted as in `src/index.ts`:
-
-| Prefix | Module | Notes |
-|--------|--------|--------|
-| `/auth` | `routes/auth.ts` | User signup/login, **admin** signup/login, admin 2FA verify |
-| `/applications` | `routes/applications.ts` | Job application **POST** (JWT + `multipart/form-data` field `resume`) |
-| `/contacts` | `routes/contacts.ts` | Public contact / support form |
-| `/blogs` | `routes/blogs.ts` | **GET** published posts (list + by slug) |
-| `/job-listings` | `routes/jobListingsPublic.ts` | Public published job openings |
-| `/admin` | `routes/admin.ts` | All routes require JWT + verified admin 2FA: blogs CRUD, job postings CRUD, applications list/approve/delete, contacts list, **`POST /admin/uploads/blog-image`** (multipart `file`) |
-
-Static files:
-
-- **`GET /uploads/*`** — Served from **`uploads/`** under the process working directory (typically this `backend/` folder). Contains `resumes/`, `blog-images/`, etc. **Add `uploads/` to `.gitignore` in production** or use object storage later.
-
-## Database (Prisma)
-
-- Schema: **`prisma/schema.prisma`**
-- Main models: `User`, `JobPosting`, `JobApplication`, `BlogPost`, `ContactInquiry`, `AdminTwoFAChallenge`
-
-After editing the schema:
-
-```bash
-npx prisma generate
-npx prisma db push
+# Step 2: Start compiled application
+npm start
 ```
 
-If `generate` fails on Windows with a file lock, close editors using `node_modules/.prisma` and retry.
+---
 
-## CORS and local dev
+## 🗄️ Database Management (Prisma Studio)
 
-The frontend often runs on `http://localhost:3000` while you may open `http://127.0.0.1:3000`. The server expands `CORS_ORIGIN` to allow both shapes when one is listed. Restart the API after changing `CORS_ORIGIN`.
+You can launch a visual GUI interface to view, edit, and inspect database records (Users, Job Applications, Blogs, Contacts):
 
-## Security notes
+```powershell
+npm run db:studio
+```
+*Opens Prisma Studio at `http://localhost:5555`*
 
-- Keep **`JWT_SECRET`** private and rotate if leaked.
-- Admin routes require **`role: ADMIN`** and **`admin2fa: true`** on the JWT after OTP verification.
-- Upload routes validate file types where implemented; keep dependencies updated.
+---
 
-## Folder layout
+## 📜 Available NPM Scripts
+
+| Script | Command | Purpose |
+|---|---|---|
+| `dev` | `tsx watch src/index.ts` | Start dev server with hot-reload |
+| `build` | `tsc && node scripts/copy-assets.mjs` | Compile TypeScript to JavaScript in `dist/` |
+| `start` | `node dist/index.js` | Run compiled production server |
+| `db:generate` | `prisma generate` | Regenerate Prisma Client types |
+| `db:push` | `prisma db push` | Push Prisma schema directly to DB |
+| `db:migrate` | `prisma migrate deploy` | Deploy production database migrations |
+| `db:studio` | `prisma studio` | Open Prisma Studio GUI in browser |
+| `admin:create` | `tsx src/scripts/create-admin.ts` | CLI tool to seed a new Admin user |
+
+---
+
+## 🔗 API Routes Reference
+
+All endpoints are mounted in [`src/index.ts`](file:///c:/Users/Ritika%20Pankar/Desktop/Cloud-Nexus-Web/CN-Web-Backend/src/index.ts):
+
+| Endpoint | Auth Required | Description |
+|---|---|---|
+| `GET /health` | No | Health check and server status |
+| `POST /auth/register` | No | Register a standard user |
+| `POST /auth/login` | No | Authenticate user & return JWT |
+| `POST /auth/admin/login` | No | Step 1 Admin login (sends 2FA email OTP) |
+| `POST /auth/admin/verify-2fa` | No | Step 2 Admin 2FA code verification (returns Admin JWT) |
+| `GET /blogs` | No | Public list of published blog posts |
+| `GET /blogs/:slug` | No | Get single published blog post by slug |
+| `GET /job-listings` | No | Public list of active job postings |
+| `POST /applications` | Optional JWT | Submit job application (`multipart/form-data` with `resume` file) |
+| `POST /contacts` | No | Submit public contact form |
+| `GET /admin/applications` | Admin 2FA JWT | List all job applications |
+| `POST /admin/applications/:id/approve` | Admin 2FA JWT | Approve pending job application |
+| `DELETE /admin/applications/:id` | Admin 2FA JWT | Delete application |
+| `GET /admin/blogs` | Admin 2FA JWT | List all blogs (draft & published) |
+| `POST /admin/blogs` | Admin 2FA JWT | Create new blog post |
+| `PUT /admin/blogs/:id` | Admin 2FA JWT | Update existing blog post |
+| `DELETE /admin/blogs/:id` | Admin 2FA JWT | Delete blog post |
+| `POST /admin/uploads/blog-image` | Admin 2FA JWT | Upload image asset for blog content |
+
+---
+
+## 📂 Folder Structure
 
 ```
-backend/
+CN-Web-Backend/
 ├── prisma/
-│   ├── schema.prisma
-│   └── migrations/        # versioned schema history (use db:migrate in prod)
+│   ├── schema.prisma       # Prisma models & DB schema
+│   └── migrations/        # Schema migration history
 ├── scripts/
-│   └── copy-assets.mjs    # copies src/data → dist/data on build
+│   └── copy-assets.mjs    # Asset copy script for build step
 ├── src/
-│   ├── index.ts           # entry: validate env, create app, start server
-│   ├── app.ts             # Express app factory (routes + middleware)
-│   ├── server.ts          # HTTP listener
-│   ├── env.ts             # dotenv loader
-│   ├── config/            # env validation, CORS helpers
-│   ├── lib/
-│   ├── middleware/        # auth, error handler, rate limiter
-│   ├── routes/            # route modules (+ /health, /health/ready)
-│   └── scripts/           # e.g. create-admin
-├── uploads/               # generated at runtime (gitignored)
+│   ├── index.ts           # Main entry point & server start
+│   ├── app.ts             # Express app setup & middleware routing
+│   ├── env.ts             # Dotenv loader
+│   ├── config/            # Environment validation & CORS setup
+│   ├── middleware/        # JWT auth, Admin 2FA guard, error handler
+│   ├── routes/            # Route modules (auth, admin, blogs, etc.)
+│   └── scripts/           # Admin creation script
+├── uploads/               # Store uploaded resumes & blog images
 ├── package.json
-├── tsconfig.json
-├── .env.example
-└── README.md              # this file
+└── tsconfig.json
 ```
-
-## Sharing only this repository
-
-1. Zip or clone **this `backend/` directory** (plus your deployment process).
-2. Recipient sets **`DATABASE_URL`** to their Postgres and **`JWT_SECRET`** to a new secret.
-3. Run **`npm install`**, **`npx prisma generate`**, **`npx prisma db push`** (or migrations), then **`npm run build`** and **`npm start`** (or `npm run dev`).
-4. Point their **frontend** or any client at the API base URL and set **CORS** to their site origin(s).
-
-If the consumer is **not** using the bundled Next.js app, they do not need `frontend/` — only this API contract and env vars matter.

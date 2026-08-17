@@ -7,7 +7,7 @@ const logger = createLogger("Server");
 export function startServer(app: Express): void {
   const { port, corsOrigins } = getAppConfig();
 
-  app.listen(port, () => {
+  app.listen(port, () => {   
     logger.info(`API http://localhost:${port}`);
     logger.info(`CORS origins: ${corsOrigins.join(", ")}`);
   });
