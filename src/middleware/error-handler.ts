@@ -1,5 +1,4 @@
 import type { Request, Response, NextFunction } from "express";
-import { Prisma } from "@prisma/client";
 import { createLogger } from "../lib/logger.js";
 
 const logger = createLogger("ErrorHandler");
@@ -16,7 +15,7 @@ export class AppError extends Error {
 }
 
 export function errorHandler(
-  err: Error,
+  err: any,
   req: Request,
   res: Response,
   _next: NextFunction,
@@ -28,9 +27,12 @@ export function errorHandler(
     method: req.method,
   });
 
-  // Handle Prisma errors
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    handlePrismaError(err, res);
+  // Handle Mongoose duplicate key error (11000)
+  if (err.code === 11000) {
+    const field = Object.keys(err.keyPattern || {})[0] || "field";
+    res.status(409).json({
+      error: `A record with this ${field} already exists`,
+    });
     return;
   }
 
@@ -43,7 +45,7 @@ export function errorHandler(
     return;
   }
 
-  // Handle validation errors
+  // Handle Mongoose validation errors
   if (err.name === "ValidationError") {
     res.status(400).json({
       error: "Validation failed",
@@ -68,44 +70,6 @@ export function errorHandler(
         ? "Something went wrong"
         : err.message,
   });
-}
-
-function handlePrismaError(
-  err: Prisma.PrismaClientKnownRequestError,
-  res: Response,
-): void {
-  switch (err.code) {
-    case "P2002":
-      // Unique constraint violation
-      res.status(409).json({
-        error: "A record with this value already exists",
-        field: (err.meta?.target as string[]) || [],
-      });
-      break;
-
-    case "P2003":
-      // Foreign key constraint violation
-      res.status(400).json({
-        error: "Referenced record does not exist",
-      });
-      break;
-
-    case "P2025":
-      // Record not found
-      res.status(404).json({
-        error: "Record not found",
-      });
-      break;
-
-    default:
-      res.status(500).json({
-        error: "Database error",
-        message:
-          process.env.NODE_ENV === "production"
-            ? "A database error occurred"
-            : err.message,
-      });
-  }
 }
 
 export function notFoundHandler(

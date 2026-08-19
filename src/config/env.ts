@@ -5,19 +5,19 @@ export type AppConfig = {
   nodeEnv: string;
   isProduction: boolean;
   isTest: boolean;
-  databaseUrl: string;
+  mongodbUri: string;
   jwtSecret: string;
   corsOrigins: string[];
 };
 
 export function validateRequiredEnv(): void {
-  if (!process.env.DATABASE_URL) {
-    console.error("Missing DATABASE_URL");
-    process.exit(1);
+  if (!process.env.MONGODB_URI && !process.env.DATABASE_URL) {
+    process.env.MONGODB_URI = "mongodb://127.0.0.1:27017/cloudnexus";
+    console.warn("[env] MONGODB_URI not set, defaulting to mongodb://127.0.0.1:27017/cloudnexus");
   }
   if (!process.env.JWT_SECRET) {
-    console.error("Missing JWT_SECRET");
-    process.exit(1);
+    process.env.JWT_SECRET = "default_secret_please_change_in_production_32chars";
+    console.warn("[env] JWT_SECRET not set, using default fallback secret");
   }
 }
 
@@ -29,7 +29,7 @@ export function getAppConfig(): AppConfig {
     nodeEnv,
     isProduction: nodeEnv === "production",
     isTest: nodeEnv === "test",
-    databaseUrl: process.env.DATABASE_URL as string,
+    mongodbUri: (process.env.MONGODB_URI || process.env.DATABASE_URL || "mongodb://127.0.0.1:27017/cloudnexus") as string,
     jwtSecret: process.env.JWT_SECRET as string,
     corsOrigins: buildCorsOrigins(),
   };

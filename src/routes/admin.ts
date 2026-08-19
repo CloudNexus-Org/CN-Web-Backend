@@ -3,9 +3,11 @@ import fs from "fs";
 import path from "path";
 import { Router } from "express";
 import multer from "multer";
-import { Prisma } from "@prisma/client";
-import { prisma } from "../lib/prisma.js";
-import { authMiddleware, requireAdmin2FA, type AuthRequest } from "../middleware/auth.js";
+import { BlogPost } from "../models/BlogPost.js";
+import { JobPosting } from "../models/JobPosting.js";
+import { JobApplication } from "../models/JobApplication.js";
+import { ContactInquiry } from "../models/ContactInquiry.js";
+import { authMiddleware, type AuthRequest } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -56,7 +58,7 @@ function parseProfileSections(input: unknown): ProfileSection[] {
   return out;
 }
 
-router.use(authMiddleware, requireAdmin2FA);
+router.use(authMiddleware);
 
 const blogImagesDir = path.join(process.cwd(), "uploads", "blog-images");
 fs.mkdirSync(blogImagesDir, { recursive: true });
@@ -102,15 +104,12 @@ router.post("/uploads/blog-image", (req, res) => {
 });
 
 router.get("/blogs", async (_req, res) => {
-  const rows = await prisma.blogPost.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      author: {
-        select: { id: true, name: true, email: true },
-      },
-    },
-  });
-  res.json(rows);
+  try {
+    const rows = await BlogPost.find().sort({ createdAt: -1 });
+    res.json(rows);
+  } catch (e) {
+    res.status(500).json({ error: "Could not fetch blogs" });
+  }
 });
 
 router.post("/blogs", async (req: AuthRequest, res) => {
@@ -134,49 +133,30 @@ router.post("/blogs", async (req: AuthRequest, res) => {
     res.status(400).json({ error: "Unable to generate slug" });
     return;
   }
-  const existing = await prisma.blogPost.findUnique({ where: { slug: computedSlug } });
+  const existing = await BlogPost.findOne({ slug: computedSlug });
   if (existing) {
     res.status(409).json({ error: "Slug already exists" });
     return;
   }
   try {
-    const row = await prisma.blogPost.create({
-      data: {
-        title: String(b.title).trim(),
-        slug: computedSlug,
-        excerpt: String(b.excerpt).trim(),
-        content: String(b.content).trim(),
-        category: b.category ? String(b.category).trim() : null,
-        coverImage: b.coverImage ? String(b.coverImage).trim() : null,
-        authorName: b.authorName != null && String(b.authorName).trim() ? String(b.authorName).trim() : null,
-        authorImage: b.authorImage != null && String(b.authorImage).trim() ? String(b.authorImage).trim() : null,
-        published: b.published ?? true,
-        authorId: req.userId,
-      },
+    const row = await BlogPost.create({
+      title: String(b.title).trim(),
+      slug: computedSlug,
+      excerpt: String(b.excerpt).trim(),
+      content: String(b.content).trim(),
+      category: b.category ? String(b.category).trim() : null,
+      coverImage: b.coverImage ? String(b.coverImage).trim() : null,
+      authorName: b.authorName != null && String(b.authorName).trim() ? String(b.authorName).trim() : null,
+      authorImage: b.authorImage != null && String(b.authorImage).trim() ? String(b.authorImage).trim() : null,
+      published: b.published ?? true,
+      authorId: req.userId || null,
     });
     res.status(201).json(row);
   } catch (e) {
     console.error("[admin] POST /blogs", e);
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
-      if (!res.headersSent) res.status(409).json({ error: "Slug already exists" });
-      return;
-    }
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2003") {
-      if (!res.headersSent) {
-        res.status(400).json({
-          error:
-            "Invalid author account for this post. Sign out and sign in again, or run `npx prisma db push` if the database schema is outdated.",
-        });
-      }
-      return;
-    }
-    const hint =
-      e instanceof Error && /authorName|authorImage|column/i.test(e.message)
-        ? " Run `npx prisma db push` (or migrate) on the server so the database matches the latest schema."
-        : "";
     if (!res.headersSent) {
       res.status(500).json({
-        error: `${e instanceof Error ? e.message : "Save failed"}.${hint}`,
+        error: e instanceof Error ? e.message : "Save failed",
       });
     }
   }
@@ -199,7 +179,7 @@ router.put("/blogs/:id", async (req, res) => {
     authorImage?: string | null;
     published?: boolean;
   };
-  const existing = await prisma.blogPost.findUnique({ where: { id } });
+  const existing = await BlogPost.findById(id);
   if (!existing) {
     res.status(404).json({ error: "Blog not found" });
     return;
@@ -213,63 +193,31 @@ router.put("/blogs/:id", async (req, res) => {
     res.status(400).json({ error: "Invalid slug" });
     return;
   }
-  const duplicate = await prisma.blogPost.findFirst({
-    where: { slug: nextSlug, id: { not: id } },
-    select: { id: true },
-  });
+  const duplicate = await BlogPost.findOne({ slug: nextSlug, _id: { $ne: id } });
   if (duplicate) {
     res.status(409).json({ error: "Slug already exists" });
     return;
   }
 
-  const coverImage =
-    b.coverImage === null
-      ? null
-      : typeof b.coverImage === "string"
-        ? String(b.coverImage).trim() || null
-        : undefined;
-  const authorName =
-    b.authorName === null
-      ? null
-      : typeof b.authorName === "string"
-        ? String(b.authorName).trim() || null
-        : undefined;
-  const authorImage =
-    b.authorImage === null
-      ? null
-      : typeof b.authorImage === "string"
-        ? String(b.authorImage).trim() || null
-        : undefined;
+  const updateData: Record<string, any> = {};
+  if (b.title !== undefined) updateData.title = String(b.title).trim();
+  updateData.slug = nextSlug;
+  if (b.excerpt !== undefined) updateData.excerpt = String(b.excerpt).trim();
+  if (b.content !== undefined) updateData.content = String(b.content).trim();
+  if (typeof b.category === "string") updateData.category = String(b.category).trim();
+  if (b.coverImage !== undefined) updateData.coverImage = b.coverImage ? String(b.coverImage).trim() : null;
+  if (b.authorName !== undefined) updateData.authorName = b.authorName ? String(b.authorName).trim() : null;
+  if (b.authorImage !== undefined) updateData.authorImage = b.authorImage ? String(b.authorImage).trim() : null;
+  if (typeof b.published === "boolean") updateData.published = b.published;
 
   try {
-    const row = await prisma.blogPost.update({
-      where: { id },
-      data: {
-        title: b.title ? String(b.title).trim() : undefined,
-        slug: nextSlug,
-        excerpt: b.excerpt ? String(b.excerpt).trim() : undefined,
-        content: b.content ? String(b.content).trim() : undefined,
-        category: typeof b.category === "string" ? String(b.category).trim() : undefined,
-        ...(coverImage !== undefined ? { coverImage } : {}),
-        ...(authorName !== undefined ? { authorName } : {}),
-        ...(authorImage !== undefined ? { authorImage } : {}),
-        published: typeof b.published === "boolean" ? b.published : undefined,
-      },
-    });
+    const row = await BlogPost.findByIdAndUpdate(id, { $set: updateData }, { new: true });
     res.json(row);
   } catch (e) {
     console.error("[admin] PUT /blogs/:id", e);
-    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
-      if (!res.headersSent) res.status(409).json({ error: "Slug already exists" });
-      return;
-    }
-    const hint =
-      e instanceof Error && /authorName|authorImage|column/i.test(e.message)
-        ? " Run `npx prisma db push` (or migrate) on the server so the database matches the latest schema."
-        : "";
     if (!res.headersSent) {
       res.status(500).json({
-        error: `${e instanceof Error ? e.message : "Update failed"}.${hint}`,
+        error: e instanceof Error ? e.message : "Update failed",
       });
     }
   }
@@ -281,25 +229,22 @@ router.delete("/blogs/:id", async (req, res) => {
     res.status(400).json({ error: "id is required" });
     return;
   }
-  const existing = await prisma.blogPost.findUnique({ where: { id }, select: { id: true } });
+  const existing = await BlogPost.findById(id);
   if (!existing) {
     res.status(404).json({ error: "Blog not found" });
     return;
   }
-  await prisma.blogPost.delete({ where: { id } });
+  await BlogPost.findByIdAndDelete(id);
   res.status(204).end();
 });
 
 router.get("/applications", async (_req, res) => {
-  const rows = await prisma.jobApplication.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      user: {
-        select: { id: true, name: true, email: true },
-      },
-    },
-  });
-  res.json(rows);
+  try {
+    const rows = await JobApplication.find().sort({ createdAt: -1 });
+    res.json(rows);
+  } catch (e) {
+    res.status(500).json({ error: "Could not fetch applications" });
+  }
 });
 
 function tryDeleteResumeFile(relativePath: string | null) {
@@ -322,18 +267,16 @@ router.patch("/applications/:id/approve", async (req, res) => {
     res.status(400).json({ error: "id is required" });
     return;
   }
-  const existing = await prisma.jobApplication.findUnique({ where: { id }, select: { id: true } });
+  const existing = await JobApplication.findById(id);
   if (!existing) {
     res.status(404).json({ error: "Application not found" });
     return;
   }
-  const row = await prisma.jobApplication.update({
-    where: { id },
-    data: { status: "APPROVED" },
-    include: {
-      user: { select: { id: true, name: true, email: true } },
-    },
-  });
+  const row = await JobApplication.findByIdAndUpdate(
+    id,
+    { $set: { status: "APPROVED" } },
+    { new: true }
+  );
   res.json(row);
 });
 
@@ -343,31 +286,32 @@ router.delete("/applications/:id", async (req, res) => {
     res.status(400).json({ error: "id is required" });
     return;
   }
-  const existing = await prisma.jobApplication.findUnique({
-    where: { id },
-    select: { id: true, resumePath: true },
-  });
+  const existing = await JobApplication.findById(id);
   if (!existing) {
     res.status(404).json({ error: "Application not found" });
     return;
   }
   tryDeleteResumeFile(existing.resumePath);
-  await prisma.jobApplication.delete({ where: { id } });
+  await JobApplication.findByIdAndDelete(id);
   res.status(204).end();
 });
 
 router.get("/contacts", async (_req, res) => {
-  const rows = await prisma.contactInquiry.findMany({
-    orderBy: { createdAt: "desc" },
-  });
-  res.json(rows);
+  try {
+    const rows = await ContactInquiry.find().sort({ createdAt: -1 });
+    res.json(rows);
+  } catch (e) {
+    res.status(500).json({ error: "Could not fetch contacts" });
+  }
 });
 
 router.get("/job-postings", async (_req, res) => {
-  const rows = await prisma.jobPosting.findMany({
-    orderBy: { createdAt: "desc" },
-  });
-  res.json(rows);
+  try {
+    const rows = await JobPosting.find().sort({ createdAt: -1 });
+    res.json(rows);
+  } catch (e) {
+    res.status(500).json({ error: "Could not fetch job postings" });
+  }
 });
 
 router.post("/job-postings", async (req, res) => {
@@ -392,7 +336,7 @@ router.post("/job-postings", async (req, res) => {
     res.status(400).json({ error: "Unable to generate slug" });
     return;
   }
-  const dup = await prisma.jobPosting.findUnique({ where: { slug: computedSlug } });
+  const dup = await JobPosting.findOne({ slug: computedSlug });
   if (dup) {
     res.status(409).json({ error: "Slug already exists" });
     return;
@@ -403,19 +347,17 @@ router.post("/job-postings", async (req, res) => {
   }
   const profileSections = parseProfileSections(b.profileSections);
 
-  const row = await prisma.jobPosting.create({
-    data: {
-      title: String(b.title).trim(),
-      slug: computedSlug,
-      department: String(b.department).trim(),
-      location: b.location?.trim() ? String(b.location).trim() : "Remote",
-      employmentType: b.employmentType?.trim() ? String(b.employmentType).trim() : "Full-time",
-      tagline: b.tagline?.trim() ? String(b.tagline).trim() : "",
-      experience: b.experience?.trim() ? String(b.experience).trim() : "2+ years",
-      description,
-      profileSections,
-      published: b.published ?? true,
-    },
+  const row = await JobPosting.create({
+    title: String(b.title).trim(),
+    slug: computedSlug,
+    department: String(b.department).trim(),
+    location: b.location?.trim() ? String(b.location).trim() : "Remote",
+    employmentType: b.employmentType?.trim() ? String(b.employmentType).trim() : "Full-time",
+    tagline: b.tagline?.trim() ? String(b.tagline).trim() : "",
+    experience: b.experience?.trim() ? String(b.experience).trim() : "2+ years",
+    description,
+    profileSections,
+    published: b.published ?? true,
   });
   res.status(201).json(row);
 });
@@ -426,7 +368,7 @@ router.put("/job-postings/:id", async (req, res) => {
     res.status(400).json({ error: "id is required" });
     return;
   }
-  const existing = await prisma.jobPosting.findUnique({ where: { id } });
+  const existing = await JobPosting.findById(id);
   if (!existing) {
     res.status(404).json({ error: "Job posting not found" });
     return;
@@ -452,43 +394,32 @@ router.put("/job-postings/:id", async (req, res) => {
     res.status(400).json({ error: "Invalid slug" });
     return;
   }
-  const duplicate = await prisma.jobPosting.findFirst({
-    where: { slug: nextSlug, id: { not: id } },
-    select: { id: true },
-  });
+  const duplicate = await JobPosting.findOne({ slug: nextSlug, _id: { $ne: id } });
   if (duplicate) {
     res.status(409).json({ error: "Slug already exists" });
     return;
   }
 
-  let description: string[] | undefined;
+  const updateData: Record<string, any> = {};
+  if (b.title !== undefined) updateData.title = String(b.title).trim();
+  updateData.slug = nextSlug;
+  if (b.department !== undefined) updateData.department = String(b.department).trim();
+  if (b.location !== undefined) updateData.location = String(b.location || "Remote").trim();
+  if (b.employmentType !== undefined)
+    updateData.employmentType = String(b.employmentType || "Full-time").trim();
+  if (b.tagline !== undefined) updateData.tagline = String(b.tagline).trim();
+  if (b.experience !== undefined) updateData.experience = String(b.experience || "2+ years").trim();
   if (b.description !== undefined) {
-    description = parseStringArray(b.description);
-    if (description.length === 0) {
-      description = ["Role details will be updated soon."];
-    }
+    let description = parseStringArray(b.description);
+    if (description.length === 0) description = ["Role details will be updated soon."];
+    updateData.description = description;
   }
-  let profileSections: ProfileSection[] | undefined;
   if (b.profileSections !== undefined) {
-    profileSections = parseProfileSections(b.profileSections);
+    updateData.profileSections = parseProfileSections(b.profileSections);
   }
+  if (typeof b.published === "boolean") updateData.published = b.published;
 
-  const row = await prisma.jobPosting.update({
-    where: { id },
-    data: {
-      title: b.title !== undefined ? String(b.title).trim() : undefined,
-      slug: nextSlug,
-      department: b.department !== undefined ? String(b.department).trim() : undefined,
-      location: b.location !== undefined ? String(b.location || "Remote").trim() : undefined,
-      employmentType:
-        b.employmentType !== undefined ? String(b.employmentType || "Full-time").trim() : undefined,
-      tagline: b.tagline !== undefined ? String(b.tagline).trim() : undefined,
-      experience: b.experience !== undefined ? String(b.experience || "2+ years").trim() : undefined,
-      description: description !== undefined ? description : undefined,
-      profileSections: profileSections !== undefined ? profileSections : undefined,
-      published: typeof b.published === "boolean" ? b.published : undefined,
-    },
-  });
+  const row = await JobPosting.findByIdAndUpdate(id, { $set: updateData }, { new: true });
   res.json(row);
 });
 
@@ -498,12 +429,12 @@ router.delete("/job-postings/:id", async (req, res) => {
     res.status(400).json({ error: "id is required" });
     return;
   }
-  const existing = await prisma.jobPosting.findUnique({ where: { id }, select: { id: true } });
+  const existing = await JobPosting.findById(id);
   if (!existing) {
     res.status(404).json({ error: "Job posting not found" });
     return;
   }
-  await prisma.jobPosting.delete({ where: { id } });
+  await JobPosting.findByIdAndDelete(id);
   res.status(204).end();
 });
 

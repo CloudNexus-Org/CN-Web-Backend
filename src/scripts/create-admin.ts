@@ -1,6 +1,8 @@
 import "../env.js";
 import bcrypt from "bcryptjs";
-import { prisma } from "../lib/prisma.js";
+import mongoose from "mongoose";
+import { connectDB } from "../lib/db.js";
+import { User } from "../models/User.js";
 
 async function main() {
   const emailArg = process.argv[2];
@@ -16,23 +18,22 @@ async function main() {
     process.exit(1);
   }
 
+  await connectDB();
+
   const email = emailArg.toLowerCase().trim();
   const name = nameArg?.trim() || "Admin User";
   const passwordHash = await bcrypt.hash(passwordArg, 10);
 
-  const existing = await prisma.user.findUnique({ where: { email } });
+  const existing = await User.findOne({ email });
   if (existing) {
-    await prisma.user.update({
-      where: { id: existing.id },
-      data: { role: "ADMIN", passwordHash, name },
+    await User.findByIdAndUpdate(existing.id, {
+      $set: { role: "ADMIN", passwordHash, name },
     });
     console.log(`Updated existing user to ADMIN: ${email}`);
     return;
   }
 
-  await prisma.user.create({
-    data: { email, name, passwordHash, role: "ADMIN" },
-  });
+  await User.create({ email, name, passwordHash, role: "ADMIN" });
   console.log(`Created ADMIN user: ${email}`);
 }
 
@@ -42,5 +43,5 @@ main()
     process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await mongoose.disconnect();
   });

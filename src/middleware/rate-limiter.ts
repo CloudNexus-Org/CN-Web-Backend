@@ -77,9 +77,3 @@ export class RateLimiter {
     clearInterval(this.cleanupInterval);
   }
 }
-
-/** Default rate limiter for chatbot endpoints: 60 requests per minute */
-export const chatbotRateLimiter = new RateLimiter(60 * 1000, 60);
-
-/** Stricter rate limiter for conversation creation: 10 per minute */
-export const conversationRateLimiter = new RateLimiter(60 * 1000, 10);

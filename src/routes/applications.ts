@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 import { Router } from "express";
 import multer from "multer";
-import { prisma } from "../lib/prisma.js";
+import { JobApplication } from "../models/JobApplication.js";
 
 const router = Router();
 const uploadRoot = path.join(process.cwd(), "uploads", "resumes");
@@ -53,20 +53,18 @@ router.post(
           .split(path.sep)
           .join("/")
       : null;
-    const row = await prisma.jobApplication.create({
-      data: {
-        userId: null,
-        jobSlug: String(b.jobSlug),
-        jobTitle: String(b.jobTitle),
-        fullName: String(b.fullName).trim(),
-        email: String(b.email).toLowerCase().trim(),
-        phone: String(b.phone).trim(),
-        currentCompany: b.currentCompany ? String(b.currentCompany) : null,
-        ctc: b.ctc ? String(b.ctc) : null,
-        experience: b.experience ? String(b.experience) : null,
-        resumeFileName: f ? f.originalname : null,
-        resumePath: relativePath,
-      },
+    const row = await JobApplication.create({
+      userId: null,
+      jobSlug: String(b.jobSlug),
+      jobTitle: String(b.jobTitle),
+      fullName: String(b.fullName).trim(),
+      email: String(b.email).toLowerCase().trim(),
+      phone: String(b.phone).trim(),
+      currentCompany: b.currentCompany ? String(b.currentCompany) : null,
+      ctc: b.ctc ? String(b.ctc) : null,
+      experience: b.experience ? String(b.experience) : null,
+      resumeFileName: f ? f.originalname : null,
+      resumePath: relativePath,
     });
     res.status(201).json({
       id: row.id,

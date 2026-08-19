@@ -1,45 +1,47 @@
-# cn-backend — Express + TypeScript + Prisma (PostgreSQL)
-FROM node:22-alpine AS deps
-RUN apk add --no-cache libc6-compat openssl
+# cn-backend — Express + TypeScript + Mongoose (MongoDB)
+
+# ---- Build Stage ----
+FROM node:22-alpine AS builder
 WORKDIR /app
+
+# Install all dependencies (including devDependencies required for build)
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM node:22-alpine AS builder
-RUN apk add --no-cache libc6-compat openssl
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY package.json package-lock.json ./
+# Copy source code and build TypeScript output to dist/
 COPY tsconfig.json ./
-COPY prisma ./prisma
 COPY scripts ./scripts
 COPY src ./src
-ENV DATABASE_URL="postgresql://build:build@127.0.0.1:5432/build?schema=public"
+RUN npm run build
 
-RUN npx prisma generate && npm run build
-
+# ---- Production Runner Stage ----
 FROM node:22-alpine AS runner
-RUN apk add --no-cache libc6-compat openssl wget
 WORKDIR /app
-ENV NODE_ENV=production
 
-RUN addgroup --system --gid 1001 nodejs \
-  && adduser --system --uid 1001 expressjs
+ENV NODE_ENV=production \
+    PORT=4000 \
+    MONGODB_URI=mongodb://db:27017/cloudnexus
 
+# Install wget for healthcheck & set up non-root expressjs user
+RUN apk add --no-cache wget && \
+    addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 expressjs
 
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/node_modules ./node_modules
+# Install ONLY production dependencies (strips devDependencies like typescript, jest, tsx)
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev && npm cache clean --force
+
+# Copy compiled JS files from builder stage
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/prisma ./prisma
 
-RUN mkdir -p uploads && chown -R expressjs:nodejs /app/uploads
+# Create uploads directory and set permissions for expressjs user
+RUN mkdir -p uploads && chown -R expressjs:nodejs /app
 
 USER expressjs
 
-ENV PORT=4000
 EXPOSE 4000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD wget -qO- "http://127.0.0.1:${PORT:-4000}/health" || exit 1
+  CMD wget -qO- "http://127.0.0.1:${PORT}/health" || exit 1
 
-CMD ["sh", "-c", "npx prisma migrate deploy && exec node dist/index.js"]
+CMD ["node", "dist/index.js"]

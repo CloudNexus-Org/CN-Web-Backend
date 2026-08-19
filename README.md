@@ -1,6 +1,6 @@
 # ⚙️ Cloud Nexus — Backend API Documentation (`CN-Web-Backend`)
 
-Standalone Node.js + Express REST API built with TypeScript, PostgreSQL (via Prisma ORM), JWT authentication, Admin 2FA (email OTP), file upload engine, and public API endpoints.
+Standalone Node.js + Express REST API built with TypeScript, MongoDB (via Mongoose ODM), JWT authentication, file upload engine, and public API endpoints.
 
 ---
 
@@ -12,11 +12,9 @@ Standalone Node.js + Express REST API built with TypeScript, PostgreSQL (via Pri
 - [Step-by-Step Execution Guide](#-step-by-step-execution-guide)
   - [1. Database Setup](#1-database-setup)
   - [2. Install Dependencies](#2-install-dependencies)
-  - [3. Database Migration & Prisma Client](#3-database-migration--prisma-client)
-  - [4. Seed Admin Account](#4-seed-admin-account)
-  - [5. Run Development Server](#5-run-development-server)
-  - [6. Run Production Server](#6-run-production-server)
-- [Database Management (Prisma Studio)](#-database-management-prisma-studio)
+  - [3. Seed Admin Account](#3-seed-admin-account)
+  - [4. Run Development Server](#4-run-development-server)
+  - [5. Run Production Server](#5-run-production-server)
 - [Available NPM Scripts](#-available-npm-scripts)
 - [API Routes Reference](#-api-routes-reference)
 - [Folder Structure](#-folder-structure)
@@ -26,8 +24,7 @@ Standalone Node.js + Express REST API built with TypeScript, PostgreSQL (via Pri
 ## ✨ Features
 
 - **Authentication**: JWT-based security for standard users and verified administrators.
-- **Admin 2FA Verification**: Multi-factor authentication via 6-digit email OTPs using Nodemailer (SMTP).
-- **ORM & Database**: PostgreSQL database managed via Prisma ORM.
+- **ODM & Database**: MongoDB database managed via Mongoose ODM.
 - **File Uploads**: Handles candidate resume uploads (`/applications`) and blog image uploads (`/admin/uploads/blog-image`).
 - **Public & Admin APIs**: Complete separation of public marketing endpoints and protected admin dashboard routes.
 

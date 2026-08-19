@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { prisma } from "../lib/prisma.js";
+import mongoose from "mongoose";
 
 const router = Router();
 
@@ -11,8 +11,11 @@ router.get("/", (_req, res) => {
 /** Readiness probe — checks database connectivity (additive endpoint) */
 router.get("/ready", async (_req, res) => {
   try {
-    await prisma.$queryRaw`SELECT 1`;
-    res.json({ ok: true, db: "connected" });
+    if (mongoose.connection.readyState === 1) {
+      res.json({ ok: true, db: "connected" });
+    } else {
+      res.status(503).json({ ok: false, db: "disconnected" });
+    }
   } catch {
     res.status(503).json({ ok: false, db: "disconnected" });
   }

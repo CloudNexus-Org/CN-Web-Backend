@@ -10,7 +10,6 @@ import blogRoutes from "./routes/blogs.js";
 import jobListingsPublicRoutes from "./routes/jobListingsPublic.js";
 import adminRoutes from "./routes/admin.js";
 import healthRoutes from "./routes/health.js";
-import chatbotRoutes from "./routes/chatbot.js";
 
 export function createApp(): Express {
   const config = getAppConfig();
@@ -38,7 +37,6 @@ export function createApp(): Express {
   app.use("/blogs", blogRoutes);
   app.use("/job-listings", jobListingsPublicRoutes);
   app.use("/admin", adminRoutes);
-  app.use("/chatbot", chatbotRoutes);
 
   // Dev-only: serve files under /uploads from repo root (replace with S3 later)
   const uploadDir = path.join(process.cwd(), "uploads");

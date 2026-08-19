@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { prisma } from "../lib/prisma.js";
+import { ContactInquiry } from "../models/ContactInquiry.js";
 
 const router = Router();
 
@@ -22,17 +22,15 @@ router.post("/", async (req, res) => {
     return;
   }
 
-  const row = await prisma.contactInquiry.create({
-    data: {
-      fullName: String(b.fullName).trim(),
-      companyName: b.companyName ? String(b.companyName).trim() : null,
-      email: String(b.email).toLowerCase().trim(),
-      phone: b.phone ? String(b.phone).trim() : null,
-      interestedIn: String(b.interestedIn).trim(),
-      estimatedBudget: b.estimatedBudget ? String(b.estimatedBudget).trim() : null,
-      heardFrom: b.heardFrom ? String(b.heardFrom).trim() : null,
-      projectDetails: String(b.projectDetails).trim(),
-    },
+  const row = await ContactInquiry.create({
+    fullName: String(b.fullName).trim(),
+    companyName: b.companyName ? String(b.companyName).trim() : null,
+    email: String(b.email).toLowerCase().trim(),
+    phone: b.phone ? String(b.phone).trim() : null,
+    interestedIn: String(b.interestedIn).trim(),
+    estimatedBudget: b.estimatedBudget ? String(b.estimatedBudget).trim() : null,
+    heardFrom: b.heardFrom ? String(b.heardFrom).trim() : null,
+    projectDetails: String(b.projectDetails).trim(),
   });
 
   res.status(201).json({ id: row.id, message: "Inquiry received" });

@@ -1,25 +1,12 @@
 import { Router } from "express";
-import { prisma } from "../lib/prisma.js";
+import { BlogPost } from "../models/BlogPost.js";
 
 const router = Router();
 
 router.get("/", async (_req, res) => {
-  const rows = await prisma.blogPost.findMany({
-    where: { published: true },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      excerpt: true,
-      category: true,
-      coverImage: true,
-      authorName: true,
-      authorImage: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
+  const rows = await BlogPost.find({ published: true })
+    .sort({ createdAt: -1 })
+    .select("title slug excerpt category coverImage authorName authorImage createdAt updatedAt");
   res.json(rows);
 });
 
@@ -29,24 +16,9 @@ router.get("/:slug", async (req, res) => {
     res.status(400).json({ error: "slug is required" });
     return;
   }
-  const row = await prisma.blogPost.findUnique({
-    where: { slug },
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      excerpt: true,
-      content: true,
-      category: true,
-      coverImage: true,
-      authorName: true,
-      authorImage: true,
-      createdAt: true,
-      updatedAt: true,
-      published: true,
-    },
-  });
-  if (!row || !row.published) {
+  const row = await BlogPost.findOne({ slug, published: true })
+    .select("title slug excerpt content category coverImage authorName authorImage createdAt updatedAt published");
+  if (!row) {
     res.status(404).json({ error: "Blog not found" });
     return;
   }
