@@ -1,6 +1,6 @@
 /** Comma-separated env entries, plus localhost ↔ 127.0.0.1 twin (avoids CORS "Failed to fetch" in dev). */
 export function buildCorsOrigins(): string[] {
-  const raw = process.env.CORS_ORIGIN || "http://localhost:3000";
+  const raw = process.env.CORS_ORIGIN;
   const bases = raw
     .split(",")
     .map((s) => s.trim())
